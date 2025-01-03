@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { fetchHomeCategories } from "@/apis/home";
@@ -10,6 +10,7 @@ export interface Category {
   _id: string;
   name: string;
 }
+
 interface CategoryFilterProps {
   onCategoriesChange: (selectedIds: string[]) => void;
 }
@@ -21,6 +22,9 @@ export function CategoryFilter({ onCategoriesChange }: CategoryFilterProps) {
   );
   const [loading, setLoading] = useState(true);
   const [isInitialized, setIsInitialized] = useState(false);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(false);
+  const scrollRef = useRef<HTMLDivElement | null>(null);
 
   // Fetch categories and initialize selection
   useEffect(() => {
@@ -47,6 +51,30 @@ export function CategoryFilter({ onCategoriesChange }: CategoryFilterProps) {
       getCategories();
     }
   }, []);
+
+  // Handle scrolling state
+  const updateScrollState = useCallback(() => {
+    const container = scrollRef.current;
+    if (container) {
+      setCanScrollLeft(container.scrollLeft > 0);
+      setCanScrollRight(
+        container.scrollLeft + container.clientWidth < container.scrollWidth,
+      );
+    }
+  }, []);
+
+  useEffect(() => {
+    const container = scrollRef.current;
+    if (container) {
+      updateScrollState();
+      container.addEventListener("scroll", updateScrollState);
+    }
+    return () => {
+      if (container) {
+        container.removeEventListener("scroll", updateScrollState);
+      }
+    };
+  }, [updateScrollState]);
 
   const handleCategoryChange = useCallback(
     (newSelected: Set<string>) => {
@@ -77,6 +105,18 @@ export function CategoryFilter({ onCategoriesChange }: CategoryFilterProps) {
     handleCategoryChange(newSelected);
   }, [categories, selectedCategories.size, handleCategoryChange]);
 
+  const scrollLeft = () => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollBy({ left: -200, behavior: "smooth" });
+    }
+  };
+
+  const scrollRight = () => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollBy({ left: 200, behavior: "smooth" });
+    }
+  };
+
   if (loading) {
     return (
       <div className="border-b sticky top-16 bg-background z-40">
@@ -90,12 +130,31 @@ export function CategoryFilter({ onCategoriesChange }: CategoryFilterProps) {
   }
 
   return (
-    <div className="border-b sticky top-16 bg-background z-40">
-      <div className="flex p-3 gap-2 overflow-x-auto scrollbar-hide">
+    <div className="border-b sticky top-16 bg-background z-40 relative">
+      {canScrollLeft && (
+        <button
+          className="absolute left-0 top-1/2 transform -translate-y-1/2 z-50 bg-gray-200 p-2
+            rounded-full shadow"
+          onClick={scrollLeft}
+        >
+          {"<"}
+        </button>
+      )}
+      {canScrollRight && (
+        <button
+          className="absolute right-0 top-1/2 transform -translate-y-1/2 z-50 bg-gray-200 p-2
+            rounded-full shadow"
+          onClick={scrollRight}
+        >
+          {">"}
+        </button>
+      )}
+      <div
+        ref={scrollRef}
+        className="flex p-3 gap-2 overflow-x-auto scrollbar-hide"
+      >
         <Button
-         variant={
-          selectedCategories.size === 0 ? "default" : "secondary"
-        }
+          variant={selectedCategories.size === 0 ? "default" : "secondary"}
           className="rounded-full"
           size="sm"
           onClick={toggleAll}

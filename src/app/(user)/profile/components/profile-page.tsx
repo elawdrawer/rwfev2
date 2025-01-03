@@ -112,16 +112,13 @@ const ProfilePage = ({ profileData }: ProfilePageProps) => {
   const router = useRouter();
   const scrollContainerRef = useRef<HTMLDivElement | null>(null);
 
-  useEffect(() => {
-    init();
-  }, []);
-
   const init = async () => {
     try {
       const data = localStorage.getItem("uib");
       const userId = JSON.parse(data || "")._id;
-      console.log("----->",userId)
       const responseData = await fetchProfilePosts(userId, count);
+      console.log("checking res of fetchProfilePosts", responseData);
+
       setvideodata(responseData?.data);
     } catch (error) {
       console.error(error);
@@ -155,6 +152,10 @@ const ProfilePage = ({ profileData }: ProfilePageProps) => {
       await getMoreData();
     }
   }
+
+  useEffect(() => {
+    init();
+  }, []);
   return (
     profileData && (
       <div className="min-h-screen p-4">
