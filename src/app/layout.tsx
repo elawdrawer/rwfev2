@@ -6,6 +6,7 @@ import ThemeDataProvider from "@/context/theme-data-provider";
 import { Header } from "@/components/layout";
 import LayoutWrapper from "@/components/layout/layout-wrapper";
 import { Toaster } from "sonner";
+import { GoogleOAuthProvider } from "@react-oauth/google";
 
 export const metadata: Metadata = {
   title: "RewardWale - Review honestly Rate diligently Earn Rewards",
@@ -34,7 +35,9 @@ export default function RootLayout({
         >
           <ThemeDataProvider>
             <LayoutWrapper>
-              <div className="container mx-auto">{children}</div>
+              <GoogleOAuthProvider clientId={process.env.GOOGLE_CLIENT_ID!}>
+                <div className="container mx-auto">{children}</div>
+              </GoogleOAuthProvider>
             </LayoutWrapper>
           </ThemeDataProvider>
         </NextThemesProvider>
