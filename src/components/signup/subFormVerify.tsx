@@ -7,6 +7,7 @@ import { OTPFormSchema } from "@/schema";
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -16,10 +17,12 @@ import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import FormError from "./form-error";
 import FormSuccess from "./form-success";
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import Link from "next/link";
 import { Verification } from "@/actions/signup";
 import { getDeviceFingerprint } from "@/lib/fingerPrint";
+import { CountdownTimerIcon, MobileIcon } from "@radix-ui/react-icons";
+import { resendOTPEmail, resendOTPMobile } from "@/apis/signUp";
 
 interface Props {
   stateChange: (one: boolean, two: boolean, three: boolean) => void;
@@ -31,9 +34,28 @@ export default function CredentialVerificationForm({
   email,
   mobile,
 }: Props) {
+  const fingerPrints = getDeviceFingerprint();
+  const isLocalStorageAvailable = localStorage;
+  // Safely access location data from localStorage
+  const latitude = isLocalStorageAvailable
+    ? (localStorage.getItem("loc-lat") ?? "90")
+    : "90";
+  const longitude = isLocalStorageAvailable
+    ? (localStorage.getItem("loc-lng") ?? "90")
+    : "90";
+
   const [pending, startTransition] = useTransition();
+  const [otpSentEmail, setOtpSentEmail] = useState<boolean>(false);
+  const [timerEmail, setTimerEmail] = useState<number>(30);
+  const [countTimeEmail, setCountTimeEmail] = useState<boolean>(true);
+
+  const [otpSentMobile, setOtpSentMobile] = useState<boolean>(false);
+  const [timerMobile, setTimerMobile] = useState<number>(30);
+  const [countTimeMobile, setCountTimeMobile] = useState<boolean>(true);
+
   const [error, setError] = useState<string | undefined>();
   const [success, setSuccess] = useState<string | undefined>();
+  const [active, setActive] = useState<boolean>(false);
   const searchParams = useSearchParams();
   const urlError =
     searchParams.get("error") === "OAuthAccountNotLinked"
@@ -53,16 +75,15 @@ export default function CredentialVerificationForm({
     setError("");
     setSuccess("");
     startTransition(() => {
-      const fingerPrints = getDeviceFingerprint();
-      const isLocalStorageAvailable = localStorage;
-      // Safely access location data from localStorage
-      const latitude = isLocalStorageAvailable
-        ? (localStorage.getItem("loc-lat") ?? "90")
-        : "90";
-      const longitude = isLocalStorageAvailable
-        ? (localStorage.getItem("loc-lng") ?? "90")
-        : "90";
-      Verification(values, "91", mobile, email,fingerPrints,latitude,longitude)
+      Verification(
+        values,
+        "91",
+        mobile,
+        email,
+        fingerPrints,
+        latitude,
+        longitude,
+      )
         .then((res) => {
           //console.log("===res===", res);
           if (res?.error) {
@@ -83,6 +104,78 @@ export default function CredentialVerificationForm({
     });
   };
 
+  const sendOTPMobile = async () => {
+    try {
+      // Simulate an API call to send OTP
+      console.log("Sending OTP...Mobile");
+      setOtpSentMobile(true);
+      setCountTimeMobile(true);
+
+      await resendOTPMobile("91", mobile, fingerPrints, latitude, longitude).then(
+        (res) => {
+          res.status ? setSuccess(res.message) : setError(res.message);
+        },
+      ).catch((err)=>console.log("error::1:",err));
+      // Reset the timer for resend cooldown
+      setTimerMobile(30);
+    } catch (error) {
+      console.error("Failed to send OTP:", error);
+    }
+  };
+
+  const sendOTPEmail = async () => {
+    try {
+      // Simulate an API call to send OTP
+      console.log("Sending OTP...Email");
+      setOtpSentEmail(true);
+      setCountTimeEmail(true);
+
+      await resendOTPEmail(email, fingerPrints, latitude, longitude).then(
+        (res) => {
+          res.status ? setSuccess(res.message) : setError(res.message);
+        },
+      ).catch((err)=>console.log("error:2::",err));
+      // Reset the timer for resend cooldown
+      setTimerEmail(30);
+    } catch (error) {
+      console.error("Failed to send OTP:", error);
+    }
+  };
+
+  useEffect(() => {
+    let countdown: any;
+    if (countTimeMobile) {
+      countdown = setInterval(() => {
+        setTimerMobile((prev) => {
+          if (prev <= 1) {
+            clearInterval(countdown);
+            setCountTimeMobile(false);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    }
+    return () => clearInterval(countdown);
+  }, [countTimeMobile]);
+
+  useEffect(() => {
+    let countdown: any;
+    if (countTimeEmail) {
+      countdown = setInterval(() => {
+        setTimerEmail((prev) => {
+          if (prev <= 1) {
+            clearInterval(countdown);
+            setCountTimeEmail(false);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    }
+    return () => clearInterval(countdown);
+  }, [countTimeEmail]);
+
   return (
     <div>
       {/* <CardWrapper
@@ -92,16 +185,16 @@ export default function CredentialVerificationForm({
         showSocial
       > */}{" "}
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-10">
           <div className="space-y-4">
-            <>
+            <div className="flex flex-col gap-4 w-full">
               <FormField
                 control={form.control}
                 name="verifyEmail"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>
-                      Please Enter OTP From Your Email <b>{email}</b>
+                      Email One-Time Password
                       <span className="text-red-600"> *</span>
                     </FormLabel>
                     <FormControl>
@@ -119,18 +212,30 @@ export default function CredentialVerificationForm({
                         }}
                       />
                     </FormControl>
+                    <FormDescription>
+                      please enter the one-time password sent to your Email{" "}
+                      <b>{email}</b>
+                    </FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-
+              <div className="flex items-end justify-end">
+                <Button onClick={sendOTPEmail} disabled={countTimeEmail}>
+                  {countTimeEmail
+                    ? `Resend OTP in ${timerEmail}s`
+                    : "Resend OTP"}
+                </Button>
+              </div>
+            </div>
+            <div className="flex flex-col gap-4 w-full">
               <FormField
                 control={form.control}
                 name="verifyMobileNumber"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>
-                      Please Enter OTP From Your Mobile <b>{mobile}</b>
+                      Phone Number One-Time Password <b>{mobile}</b>
                       <span className="text-red-600"> *</span>
                     </FormLabel>
                     <FormControl>
@@ -148,11 +253,22 @@ export default function CredentialVerificationForm({
                         }}
                       />
                     </FormControl>
+                    <FormDescription>
+                      please enter the one-time password sent to your phone
+                      number <b>{mobile}</b>
+                    </FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-            </>
+              <div className="flex items-end justify-end">
+                <Button onClick={sendOTPMobile} disabled={countTimeMobile}>
+                  {countTimeMobile
+                    ? `Resend OTP in ${timerMobile}s`
+                    : "Resend OTP"}
+                </Button>
+              </div>
+            </div>
           </div>
           {(error || urlError) && <FormError message={error || urlError} />}
           {success && <FormSuccess message={success} />}

@@ -6,11 +6,11 @@ import { MdDelete } from "react-icons/md";
 import { ScrollArea } from "@radix-ui/react-scroll-area";
 import AllVideoCardItem from "../../search/components/search-allReviews-item";
 import { ScrollBar } from "@/components/ui/scroll-area";
-import { videoData } from "./profile-page";
+import { VideoData } from "./dataTypes";
 import { cn } from "@/lib/utils";
 
   export interface videoProps extends React.HTMLAttributes<HTMLDivElement> {
-    data: videoData;
+    data: VideoData;
     width: number;
     height: number;
     aspectRatio: "portrait";
@@ -27,7 +27,7 @@ export default function ProfileItem({
   }: videoProps) {
     const router = useRouter();
     return (
-    <div className={cn(" relative h-full", className)} {...props}>
+    <div className={cn(" relative h-full border rounded-md", className)} {...props}>
         <div className="overflow-hidden relative cursor-pointer h-full" 
         onClick={() => router.push("/watch?v=" + data.videoId)}
   >
@@ -47,7 +47,7 @@ export default function ProfileItem({
   
           <div className="flex-1 min-w-0 absolute bottom-0 p-2">
             <p
-              className={`font-semibold sm:text-sm text-md text-ellipsis overflow-hidden whitespace-nowrap
+              className={`font-semibold text-xs  sm:text-sm text-md text-ellipsis overflow-hidden whitespace-nowrap
                 text-pretty w-full h-5 hover:h-auto text-white cursor-pointer`}
             >
               {data.title}

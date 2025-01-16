@@ -31,7 +31,7 @@ export function VideoUploader({ onUploadComplete, hasExistingVideo }: VideoUploa
         clearInterval(interval);
         const videoUrl = URL.createObjectURL(file);
         onUploadComplete(videoUrl, file);
-        toast.success("Video uploaded successfully! Click Next to continue.");
+        // toast.success("Video uploaded successfully! Click Next to continue.");
         setIsUploading(false);
       }
     }, 100);

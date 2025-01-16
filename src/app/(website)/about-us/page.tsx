@@ -1,8 +1,8 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import Slider from "react-slick";
-import "slick-carousel/slick/slick.css";
-import "slick-carousel/slick/slick-theme.css";
+// import Slider from "react-slick";
+// import "slick-carousel/slick/slick.css";
+// import "slick-carousel/slick/slick-theme.css";
 import Image from "next/image";
 import bg1 from "../../../../public/company-terms/bg01.jpg";
 import bg2 from "../../../../public/company-terms/medium-shot-young-people-with-reviews 1.png";
@@ -22,8 +22,6 @@ import FeatImage3 from "../../../../public/company-terms/character-3.png";
 import FeatImage4 from "../../../../public/company-terms/Mask group.png";
 import FeatImage5 from "../../../../public/company-terms/Mask group2.png";
 import { Header } from "@/components/layout";
-
-
 
 export default function AboutUs() {
   const settings = {
@@ -148,7 +146,7 @@ export default function AboutUs() {
     <div className="bg-white dark:bg-zinc-900 overflow-hidden">
       <Header />
 
-      <Slider {...settings}>
+      {/* <Slider {...settings}>
         {[
           {
             title: "Desh ka review platform",
@@ -198,7 +196,7 @@ export default function AboutUs() {
             </div>
           </section>
         ))}
-      </Slider>
+      </Slider> */}
       <div className="relative">
         <div className="absolute lg:-top-24 2xl:-top-44 left-0 right-0 w-full">
           <Image
@@ -208,12 +206,12 @@ export default function AboutUs() {
           />
         </div>
       </div>
-      <>
-        <section className="relative">
-          <div className="max-w-6xl mx-auto sm:px-6 px-4 h-full">
-            <RewardWaleTitleCard />
-            <div className="flex flex-wrap gap-10 justify-center">
-              {/* <InfoCard
+
+      <section className="relative">
+        <div className="max-w-6xl mx-auto sm:px-6 px-4 h-full">
+          <RewardWaleTitleCard />
+          <div className="flex flex-wrap gap-10 justify-center">
+            {/* <InfoCard
                 title={"Scattered Review Market"}
                 description={
                   "Review information is scattered, with written reviews on" +
@@ -222,150 +220,149 @@ export default function AboutUs() {
                 }
                 sideImage={BlockImage2}
               /> */}
-              <InfoCard
-                title={" No Dedicated Platform"}
-                description={
-                  " Existing platforms lack a specific focus on video reviews."
-                }
-                sideImage={BlockImage3}
-              />
-              <InfoCard
-                title={"Lack of User Incentives"}
-                description={
-                  "Users are not motivated to post reviews on a centralized platform."
-                }
-                sideImage={BlockImage4}
-              />
-              <InfoCard
-                title={" Lack of trust and feedback loop"}
-                description={`Existing review platforms often struggle with a lack of
+            <InfoCard
+              title={" No Dedicated Platform"}
+              description={
+                " Existing platforms lack a specific focus on video reviews."
+              }
+              sideImage={BlockImage3}
+            />
+            <InfoCard
+              title={"Lack of User Incentives"}
+              description={
+                "Users are not motivated to post reviews on a centralized platform."
+              }
+              sideImage={BlockImage4}
+            />
+            <InfoCard
+              title={" Lack of trust and feedback loop"}
+              description={`Existing review platforms often struggle with a lack of
                       trust among users, compounded by an ineffective feedback
                       loop that limits their overall impact.`}
-                sideImage={BlockImage5}
-              />
-              <InfoCard
-                title={"Limited Buyer-Seller Connection"}
-                description={`Absence of direct links between buyers and sellers hampers
+              sideImage={BlockImage5}
+            />
+            <InfoCard
+              title={"Limited Buyer-Seller Connection"}
+              description={`Absence of direct links between buyers and sellers hampers
                       real-time information access.`}
-                sideImage={BlockImage6}
-              />
-            </div>
-            <div className="flex justify-center items-center">
-              <ReviewMatterCard />
-            </div>
+              sideImage={BlockImage6}
+            />
+          </div>
+          <div className="flex justify-center items-center">
+            <ReviewMatterCard />
+          </div>
 
-            <div className="flex justify-center items-center">
+          <div className="flex justify-center items-center">
+            <div
+              className="flex items-center justify-between gap-4 px-4 md:px-28 py-4 md:py-10
+                bg-purple-300 rounded-xl max-md:my-6 lg:m-12"
+            >
+              <div>
+                <Image src={FeatImage2} alt="image" className="w-60" />
+              </div>
               <div
-                className="flex items-center justify-between gap-4 px-4 md:px-28 py-4 md:py-10
-                  bg-purple-300 rounded-xl max-md:my-6 lg:m-12"
+                className="flex flex-col gap-5 text-xs md:text-base 2xl:text-2xl tracking-wide
+                  2xl:tracking-tight 2xl:w-2/3"
               >
-                <div>
-                  <Image src={FeatImage2} alt="image" className="w-60" />
-                </div>
+                <p>
+                  Featuring reviews can increase a retail businesses conversion
+                  rate by <span className="font-bold">270%</span>
+                   -Spiegel Research Center
+                </p>
+                <p>
+                  <span className="font-bold">95%</span> of customers read
+                  online reviews before buying a product
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex justify-center items-center">
+            <div
+              className="bg-white dark:bg-zinc-800 rounded-xl shadow-lg shadow-violet-200
+                dark:shadow-black my-12 lg:mx-12 p-7 md:block"
+            >
+              <h1 className="h1 mb-4 text-violet-600 md:text-4xl 2xl:text-4xl text-center font-semibold">
+                Why Short Video format?
+              </h1>
+
+              <div className="flex items-center justify-between mx-10">
                 <div
-                  className="flex flex-col gap-5 text-xs md:text-base 2xl:text-2xl tracking-wide
-                    2xl:tracking-tight 2xl:w-2/3"
+                  className="flex flex-col gap-5 text-xs md:text-base 2xl:text-xl 2xl:w-2/3 tracking-wide
+                    text-neutral-700 dark:text-stone-300"
                 >
                   <p>
-                    Featuring reviews can increase a retail businesses
-                    conversion rate by <span className="font-bold">270%</span>
-                     -Spiegel Research Center
+                    According to sources from Inc24, Cisco, Statista and
+                    Redseer, 96% global social media users watch videos lasting
+                    &gt; 4 mins
+                  </p>
+
+                  <p>
+                    Attention span of millenials has declined to 12 seconds and
+                    Genz to 8 seconds
                   </p>
                   <p>
-                    <span className="font-bold">95%</span> of customers read
-                    online reviews before buying a product
+                    In India, short-form video platforms are projected to
+                    constitute 40% of the $8–11 billion video commerce industry
+                    by 2030.
+                  </p>
+                  <p>
+                    Short video platform per session time for Tiktok is 45
+                    minutes and Instagram is 53 minutes
                   </p>
                 </div>
-              </div>
-            </div>
-
-            <div className="flex justify-center items-center">
-              <div
-                className="bg-white dark:bg-zinc-800 rounded-xl shadow-lg shadow-violet-200
-                  dark:shadow-black my-12 lg:mx-12 p-7 md:block"
-              >
-                <h1 className="h1 mb-4 text-violet-600 md:text-4xl 2xl:text-4xl text-center font-semibold">
-                  Why Short Video format?
-                </h1>
-
-                <div className="flex items-center justify-between mx-10">
-                  <div
-                    className="flex flex-col gap-5 text-xs md:text-base 2xl:text-xl 2xl:w-2/3 tracking-wide
-                      text-neutral-700 dark:text-stone-300"
-                  >
-                    <p>
-                      According to sources from Inc24, Cisco, Statista and
-                      Redseer, 96% global social media users watch videos
-                      lasting &gt; 4 mins
-                    </p>
-
-                    <p>
-                      Attention span of millenials has declined to 12 seconds
-                      and Genz to 8 seconds
-                    </p>
-                    <p>
-                      In India, short-form video platforms are projected to
-                      constitute 40% of the $8–11 billion video commerce
-                      industry by 2030.
-                    </p>
-                    <p>
-                      Short video platform per session time for Tiktok is 45
-                      minutes and Instagram is 53 minutes
-                    </p>
-                  </div>
-                  <div className="hidden md:inline-block sm:block">
-                    <Image src={FeatImage3} alt="image" />
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="grid md:grid-cols-2 gap-5 md:my-12 lg:mx-12 2xl:mx-0 md:py-7 lg:px-7 max-md:pb-3">
-              <div className="bg-purple-300 rounded-2xl relative">
-                <div className="flex flex-col justify-center md:w-96 2xl:w-4/5 py-6 md:py-10 px-5">
-                  <h2 className="text-white text-xs md:text-2xl font-extrabold">
-                    Our
-                  </h2>
-                  <div className="flex-col justify-start items-start gap-2.5 inline-flex">
-                    <h1 className="text-violet-600 md:text-3xl 2xl:text-3xl font-extrabold">
-                      Vision
-                    </h1>
-                    <p className="text-xs md:text-base md:text-balance 2xl:text-2xl">
-                      To build powerful connections between businesses and
-                      people by empowering authentic feedback and transforming
-                      engagement into actionable business insights.
-                    </p>
-                  </div>
-                </div>
-
-                <div className="absolute top-0 2xl:right-0">
-                  <Image src={FeatImage5} alt="image" />
-                </div>
-              </div>
-              <div className="bg-purple-300 rounded-2xl relative">
-                <div className="flex flex-col justify-center md:w-96 2xl:w-4/5 py-6 md:py-10 px-5">
-                  <h2 className="text-white text-xs md:text-2xl font-extrabold">
-                    Our
-                  </h2>
-                  <div className="flex-col justify-start items-start gap-2.5 inline-flex">
-                    <h1 className="text-violet-600 md:text-4xl 2xl:text-3xl font-extrabold">
-                      Mission
-                    </h1>
-                    <p className="text-xs md:text-base 2xl:text-2xl">
-                      To create a transparent future by fostering engagement,
-                      loyalty and trust between customers and businesses
-                    </p>
-                  </div>
-                </div>
-
-                <div className="absolute top-0 2xl:right-0">
-                  <Image src={FeatImage4} alt="image" />
+                <div className="hidden md:inline-block sm:block">
+                  <Image src={FeatImage3} alt="image" />
                 </div>
               </div>
             </div>
           </div>
-        </section>
-      </>
+
+          <div className="grid md:grid-cols-2 gap-5 md:my-12 lg:mx-12 2xl:mx-0 md:py-7 lg:px-7 max-md:pb-3">
+            <div className="bg-purple-300 rounded-2xl relative">
+              <div className="flex flex-col justify-center md:w-96 2xl:w-4/5 py-6 md:py-10 px-5">
+                <h2 className="text-white text-xs md:text-2xl font-extrabold">
+                  Our
+                </h2>
+                <div className="flex-col justify-start items-start gap-2.5 inline-flex">
+                  <h1 className="text-violet-600 md:text-3xl 2xl:text-3xl font-extrabold">
+                    Vision
+                  </h1>
+                  <p className="text-xs md:text-base md:text-balance 2xl:text-2xl">
+                    To build powerful connections between businesses and people
+                    by empowering authentic feedback and transforming engagement
+                    into actionable business insights.
+                  </p>
+                </div>
+              </div>
+
+              <div className="absolute top-0 2xl:right-0">
+                <Image src={FeatImage5} alt="image" />
+              </div>
+            </div>
+            <div className="bg-purple-300 rounded-2xl relative">
+              <div className="flex flex-col justify-center md:w-96 2xl:w-4/5 py-6 md:py-10 px-5">
+                <h2 className="text-white text-xs md:text-2xl font-extrabold">
+                  Our
+                </h2>
+                <div className="flex-col justify-start items-start gap-2.5 inline-flex">
+                  <h1 className="text-violet-600 md:text-4xl 2xl:text-3xl font-extrabold">
+                    Mission
+                  </h1>
+                  <p className="text-xs md:text-base 2xl:text-2xl">
+                    To create a transparent future by fostering engagement,
+                    loyalty and trust between customers and businesses
+                  </p>
+                </div>
+              </div>
+
+              <div className="absolute top-0 2xl:right-0">
+                <Image src={FeatImage4} alt="image" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
     </div>
   );
 }

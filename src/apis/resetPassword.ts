@@ -80,9 +80,9 @@ export async function sendResetPassword(token: string, password: string) {
     );
     console.log("forgot password response===>", response);
     if (response.status === 200) {
-      return { status: true, message: response.data };
+      return { status: true, message: response.data.message };
     } else {
-      return { status: false, message: response.data };
+      return { status: false, message: response.data.message };
     }
   } catch (error: any) {
     console.error("error", error.response);

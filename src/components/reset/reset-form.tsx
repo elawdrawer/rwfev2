@@ -1,6 +1,6 @@
 "use client";
 import { useForm } from "react-hook-form";
-import * as z from "zod";
+import type * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ResetSchema } from "@/schema";
 import {

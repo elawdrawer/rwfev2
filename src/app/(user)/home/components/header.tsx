@@ -18,6 +18,7 @@ import {
   Settings,
   LogOut,
   SearchIcon,
+  Handshake,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Sidebar } from "./sidebar";
@@ -65,6 +66,13 @@ export function Header() {
               <Settings className="mr-2 h-4 w-4" />
               Settings
             </DropdownMenuItem>
+            <DropdownMenuItem
+            onClick={()=> router.push('createBusiness')}
+            >
+            <Handshake className="mr-2 h-4 w-4" />
+              Create Business Profile
+            </DropdownMenuItem>
+
             <DropdownMenuItem
               onClick={async () => {
                 await logout();

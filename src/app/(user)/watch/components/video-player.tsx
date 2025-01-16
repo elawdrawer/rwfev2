@@ -1,11 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
-// import { useVideoContext } from "../providers/video-controls-provider";
-import { Play, Pause, Volume2, VolumeX } from "lucide-react";
+import { useEffect, useState, useRef } from "react";
+import { Play, Pause, Volume2, VolumeX, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useVideoContext } from "../providers/video-control-provider";
-import { VideoLoading } from "./video-loading";
+import { rateVideo } from "@/apis/watch";
+import { useSearchParams } from "next/navigation";
+import { StarRating } from "../../post/components/StarRating";
 
 interface VideoPlayerProps {
   videoUrl?: string;
@@ -16,7 +17,15 @@ export function VideoPlayer({ videoUrl }: VideoPlayerProps) {
     useVideoContext();
   const [progress, setProgress] = useState(0);
   const [showControls, setShowControls] = useState(true);
-  const [isLoading, setIsLoading] = useState(true);
+  const [showOverlay, setShowOverlay] = useState(false);
+  const [showThankYou, setShowThankYou] = useState(false);
+  const [countdown, setCountdown] = useState(10);
+  const [hoverRating, setHoverRating] = useState(0);
+  const isVideoEnded = useRef(false);
+  const [rating, setRating] = useState(0);
+
+  const searchParams = useSearchParams();
+  const videoId = searchParams.get("v") || "";
 
   useEffect(() => {
     const video = videoRef.current;
@@ -38,8 +47,19 @@ export function VideoPlayer({ videoUrl }: VideoPlayerProps) {
       setProgress((video.currentTime / video.duration) * 100);
     };
 
+    const handleEnded = () => {
+      isVideoEnded.current = true;
+      setShowOverlay(true);
+      setCountdown(10); // Reset countdown timer
+    };
+
     video.addEventListener("timeupdate", handleTimeUpdate);
-    return () => video.removeEventListener("timeupdate", handleTimeUpdate);
+    video.addEventListener("ended", handleEnded);
+
+    return () => {
+      video.removeEventListener("timeupdate", handleTimeUpdate);
+      video.removeEventListener("ended", handleEnded);
+    };
   }, [videoUrl, videoRef]);
 
   // Hide controls after video starts playing
@@ -53,6 +73,36 @@ export function VideoPlayer({ videoUrl }: VideoPlayerProps) {
       setShowControls(true);
     }
   }, [isPlaying]);
+
+  useEffect(() => {
+    if (showOverlay) {
+      const timer = setInterval(() => {
+        setCountdown((prev) => {
+          if (prev <= 1) {
+            setShowOverlay(false);
+            clearInterval(timer);
+          }
+          return prev - 1;
+        });
+      }, 1000);
+      return () => clearInterval(timer);
+    }
+  }, [showOverlay]);
+
+  const handleRatingChange = async (rating: number) => {
+    console.log("User rating:", rating);
+    setRating(rating)
+    let payload = {
+      rating: rating,
+    };
+    let res = await rateVideo(videoId, payload);
+    console.log("checking res of rate video", res.message);
+    if (res) {
+      setShowThankYou(true);
+    }
+    setShowOverlay(false);
+    setTimeout(() => setShowThankYou(false), 3000); // Show thank you message for 3 seconds
+  };
 
   if (!videoUrl) {
     return (
@@ -74,12 +124,9 @@ export function VideoPlayer({ videoUrl }: VideoPlayerProps) {
         src={videoUrl}
         className="w-full h-full object-contain"
         controls={false}
-        loop
         playsInline
         muted={isMuted}
       />
-
-      {/* {isLoading && <VideoLoading />} */}
 
       {/* Center play/pause button - only shown when controls are visible */}
       <div
@@ -124,6 +171,31 @@ export function VideoPlayer({ videoUrl }: VideoPlayerProps) {
           style={{ width: `${progress}%` }}
         />
       </div>
+
+      {/* Overlay */}
+      {showOverlay && (
+        <div
+          className="absolute inset-0 bg-black/70 flex flex-col items-center justify-center
+            text-white"
+        >
+          <h2 className="text-2xl font-semibold mb-4">Rate this video</h2>
+          <StarRating
+            value={rating}
+            onChange={handleRatingChange}
+            type="interactive"
+          />
+          <p className="text-sm mt-2">
+            This overlay will disappear in {countdown} seconds.
+          </p>
+        </div>
+      )}
+
+      {/* Thank you message */}
+      {showThankYou && (
+        <div className="absolute inset-0 bg-black/70 flex items-center justify-center text-white">
+          <h2 className="text-2xl font-semibold">Thank you for your rating!</h2>
+        </div>
+      )}
     </div>
   );
 }

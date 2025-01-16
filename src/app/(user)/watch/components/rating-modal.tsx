@@ -28,8 +28,8 @@ export function RatingModal({ isOpen, onClose, onSubmit }: RatingModalProps) {
         <DialogHeader>
           <DialogTitle>Rate this video</DialogTitle>
         </DialogHeader>
-        <div className="flex flex-col items-center gap-6 py-4">
-          <div className="flex gap-1">
+        <div className="flex flex-col items-center gap-4 py-4">
+          <div className="flex gap-2">
             {[1, 2, 3, 4, 5].map((value) => (
               <button
                 key={value}
@@ -48,15 +48,15 @@ export function RatingModal({ isOpen, onClose, onSubmit }: RatingModalProps) {
               </button>
             ))}
           </div>
-          <div className="text-sm text-center text-muted-foreground">
-            {rating === 0 ? "Select a rating" : `You rated ${rating} out of 5 stars`}
-          </div>
+          <p className="text-sm text-center">
+            {rating === 0 ? "Select a rating" : `You rated this video ${rating} out of 5 stars.`}
+          </p>
           <div className="flex gap-3">
             <Button variant="outline" onClick={onClose}>
               Cancel
             </Button>
             <Button onClick={handleSubmit} disabled={rating === 0}>
-              Submit Rating
+              Submit
             </Button>
           </div>
         </div>

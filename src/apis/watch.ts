@@ -67,7 +67,10 @@ export async function getVideoComments(iD: string) {
     skip: "0",
     lastCommentId: "null",
   }).toString();
-  const response = await apiClient(`/video/comment/${iD}?${queryParams}`, "GET");
+  const response = await apiClient(
+    `/video/comment/${iD}?${queryParams}`,
+    "GET",
+  );
 
   if (response.success && response.data) {
     return response.data;
@@ -80,10 +83,10 @@ export async function getVideoComments(iD: string) {
 // // Like a comment
 export const likeComment = async (commentId: string) => {
   try {
-    const response = await apiClient(`comment/like/${commentId}`,'PUT');
+    const response = await apiClient(`comment/like/${commentId}`, "PUT");
     return response.data;
   } catch (error) {
-    console.error('Error liking comment:', error);
+    console.error("Error liking comment:", error);
     throw error;
   }
 };
@@ -91,32 +94,41 @@ export const likeComment = async (commentId: string) => {
 // Unlike a comment
 export const unlikeComment = async (commentId: string) => {
   try {
-    const response = await apiClient(`comment/unlike/${commentId}`,'PUT');
+    const response = await apiClient(`comment/unlike/${commentId}`, "PUT");
     return response.data;
   } catch (error) {
-    console.error('Error unliking comment:', error);
+    console.error("Error unliking comment:", error);
     throw error;
   }
 };
 
 // // Add or edit a comment
 
-export const addNewComment = async (videoId:string , payload: Record<string, any>) => {
+export const addNewComment = async (
+  videoId: string,
+  payload: Record<string, any>,
+) => {
   try {
-    const response = await apiClient(`/commentOnVideo/${videoId}`,'POST', payload);
+    const response = await apiClient(
+      `/commentOnVideo/${videoId}`,
+      "POST",
+      payload,
+    );
     return response.data;
   } catch (error) {
-    console.error('Error adding comment:', error);
+    console.error("Error adding comment:", error);
     throw error;
   }
 };
 
-// delete comment 
-
+// delete comment
 
 export async function deleteComment(videoId: string, commentId: string) {
   try {
-    const response = await apiClient(`/comment/${videoId}/${commentId}`, "DELETE");
+    const response = await apiClient(
+      `/comment/${videoId}/${commentId}`,
+      "DELETE",
+    );
 
     if (response.success && response.data) {
       return response.data;
@@ -130,15 +142,56 @@ export async function deleteComment(videoId: string, commentId: string) {
   }
 }
 
+//rate the video
+
+export async function rateVideo(videoId: string, payload: Record<string, any>) {
+  try {
+    const response = await apiClient(
+      `/video/rating/${videoId}`,
+      "PUT",
+      payload,
+    );
+    if (response.success && response.data) {
+      return response.data;
+    } else {
+      console.error("Failed to fetch:", response.error);
+      return null;
+    }
+  } catch (error) {
+    console.error("Error in Like video", error);
+    return null;
+  }
+}
+
+// Reply to a comment
+export const replyToComment = async (commentId: string, text: string) => {
+  try {
+    const response = await apiClient(`/comment/${commentId}`,
+      "POST", { comment:text }
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Error replying to comment:', error);
+    throw error;
+  }
+};
 
 
-// // Reply to a comment
-// export const replyToComment = async (commentId: string, text: string) => {
-//   try {
-//     const response = await axios.post(`${API_BASE_URL}/api/v2/comment/${commentId}/comment`, { text });
-//     return response.data;
-//   } catch (error) {
-//     console.error('Error replying to comment:', error);
-//     throw error;
-//   }
-// };
+export const getReplyComment = async (commentId: string,count:number) => {
+  try {
+    const queryParams = new URLSearchParams({
+      limit: "10",
+      skip:JSON.stringify(count),
+      
+    }).toString();
+    const response = await apiClient(`/video/replyComment/${commentId}?${queryParams}`,
+      "GET"
+    );
+    console.log("response reply",response)
+    return response.data;
+  } catch (error) {
+    console.error('Error replying to comment:', error);
+    throw error;
+  }
+};
+

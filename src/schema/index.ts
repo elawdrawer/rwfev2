@@ -189,6 +189,84 @@ export const OTPFormSchema = z.object({
     .max(6),
 });
 
+
+export const EditPersonalInfoFormSchema = z.object({
+  gender: z.string({ message: "choose your gender" }).nonempty({
+    message: "Gender cannot be empty.",
+  }),
+  // city: z.string({ message: "Enter location" }).nonempty({
+  //   message: "Location cannot be empty.",
+  // }),
+  // .max(10, "Postal code cannot exceed 10 characters")
+  // .regex(/^[a-zA-Z0-9\s\-]+$/, "Invalid postal code format"),
+  firstname: z
+    .string()
+    .nonempty({
+      message: "First name cannot be empty.",
+    })
+    .min(3, {
+      message: "Invalid first name. It must be between 3 and 30 characters long.",
+    })
+    .max(30, {
+      message: "Invalid first name. It must be between 3 and 30 characters long.",
+    })
+    .regex(/^[A-Za-z]+$/, {
+      message: "First name can only contain alphabets.",
+    }),
+  lastname: z
+    .string()
+    .nonempty({
+      message: "Last Name cannot be empty.",
+    })
+    .min(1, {
+      message:  "Invalid Last name. It must be between 1 and 30 characters long.",
+    })
+    .max(30, {
+      message:  "Invalid Last name. It must be between 1 and 30 characters long.",
+    })
+    .regex(/^[A-Za-z]+$/, {
+      message: "Last name can only contain alphabets.",
+    }),
+  email: z
+    .string({
+      required_error: "Please select an email to display.",
+    })
+    .nonempty({
+      message: "Email cannot be empty.",
+    })
+    .email(),
+  dob: z
+    .date({
+      required_error: "A date of birth is required.",
+    })
+    .refine(
+      (date) => {
+        const today = new Date();
+        const age = today.getFullYear() - date.getFullYear();
+        const hasHadBirthdayThisYear =
+          today.getMonth() > date.getMonth() ||
+          (today.getMonth() === date.getMonth() &&
+            today.getDate() >= date.getDate());
+        return hasHadBirthdayThisYear ? age >= 18 : age > 18;
+      },
+      {
+        message: "You must be at least 18 years old to use this application.",
+      },
+    ),
+
+  mobile: z
+    .string()
+    .nonempty({
+      message: "Mobile Number cannot be empty.",
+    })
+    .regex(/^(91[-\s]?)?[6-9]\d{9}$/, {
+      message:
+        "Must be a valid 10-digit number.",
+    }),
+    title:z.string().optional(),
+    desc:z.string().optional()
+});
+
 export const combinedSchema = z.object({
   ...PersonalInfoFormSchema.shape,
   ...OTPFormSchema.shape,

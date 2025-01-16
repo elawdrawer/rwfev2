@@ -1,5 +1,10 @@
 "use client";
-import { fetchProfilePosts } from "@/apis/profile";
+import {
+  fetchProfilePosts,
+  fetchTaggedVideos,
+  followUser,
+  unFollowUser,
+} from "@/apis/profile";
 import { ScrollBar } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@radix-ui/react-scroll-area";
@@ -10,119 +15,99 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import ProfileItem from "./profileItem";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogTrigger } from "@/components/ui/dialog";
+import { FollowersList } from "./followers";
+import { ProfileDataProps, VideoData } from "./dataTypes";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import SocialMedia from "./SocialMedia";
+import EditProfile from "./edit-profile";
+import { FollowingList } from "./following";
 
-interface SocialUrls {
-  whatsapp: string;
-  linkedin: string;
-  facebook: string;
-  instagram: string;
-  twitter: string;
-}
-
-interface IndPic {
-  original: string;
-  thumbnail: string;
-}
-
-interface ProfileData {
-  _id: string;
-  indFirstName: string;
-  indLastName: string;
-  businessName: string;
-  userName: string;
-  desc: string;
-  indDob: string;
-  interest: string;
-  socialUrls: SocialUrls;
-  isMobileVerified: boolean;
-  isEmailVerified: boolean;
-  isBusinessUser: boolean;
-  indEmailNotify: boolean;
-  indMobileNotify: boolean;
-  isAccountVerified: boolean;
-  isPrivateAccount: boolean;
-  avgRating: number;
-  totalRating: number;
-  indGender: string;
-  indPic: IndPic;
-  indLanPref: string;
-  indContentPref: string;
-  totalUnpublishedPosts: number;
-  totalPublishedPosts: number;
-  totalFollowers: number;
-  totalFollowing: number;
-  indCategories: string[];
-  profileImages: string[];
-  title: string;
-}
-
-interface ProfilePageProps {
-  profileData: {
-    message: string;
-    data: ProfileData;
-  };
-}
-
-export async function generateMetadata({
-  profileData,
-}: ProfilePageProps): Promise<Metadata> {
-  const username = profileData.data.indFirstName;
+export async function generateMetadata(
+  profileData: ProfileDataProps,
+): Promise<Metadata> {
+  const username = profileData.indFirstName;
   return {
     title: `${username}'s Profile | Rewardwale`,
     description: `View the profile of ${username} on Rewardwale.`,
   };
 }
 
-export interface videoData {
-  _id: string;
-  userDetails: {
-    userId: string;
-    firstName: string;
-    lastName: string;
-    userName: string;
-  };
-  videoId: string;
-  hashtags: string[];
-  title: string;
-  desc: string;
-  cdnVideoPath: string;
-  cdnThumbPath: string[];
-  totalViewCount: number;
-  totalShareCount: number;
-  totalLikes: number;
-  totalComments: number;
-  isCommentingAllowed: boolean;
-  avgRating: number;
-  status: string;
-  uploadedAt: string;
-  videoLocation: {
-    type: string;
-    coordinates: number[];
-  };
-  locationName: string;
-  isSponsored: boolean;
-  isAdvertisement: boolean;
-  categoryId: string;
-  categoryName: string;
+interface Props {
+  profileData: ProfileDataProps | undefined;
+  id: string;
 }
 
-const ProfilePage = ({ profileData }: ProfilePageProps) => {
-  const [videoData, setvideodata] = useState<videoData[] | []>([]);
+const ProfilePage = ({ profileData, id }: Props) => {
+  const [videoData, setvideodata] = useState<VideoData[] | []>([]);
+  const [taggedVideo, setTaggedVideo] = useState<VideoData[] | []>([]);
   const [count, setCount] = useState<number>(0);
   const router = useRouter();
   const scrollContainerRef = useRef<HTMLDivElement | null>(null);
-
+  const [myProfile, setMyProfile] = useState<boolean>(false);
+  const [follower, setFollower] = useState<boolean>();
+  const [data, setData] = useState<{
+    fname: string;
+    lname: string;
+    desc: string;
+    title: string;
+    dob: Date;
+    gender: string;
+    email: string | undefined;
+    phone: string | undefined;
+  }>({
+    fname: "",
+    lname: "",
+    desc: "",
+    title: "",
+    dob: new Date(),
+    gender: "",
+    email: "",
+    phone: "",
+  });
+console.log("profile data::::",profileData)
   useEffect(() => {
-    init();
+  
+    if (profileData) {
+      console.log("profile data::1::")
+      const data = localStorage.getItem("uib");
+      const name = JSON.parse(data || "").userName;
+      if (name === profileData.userName) {
+        setMyProfile(true);
+  
+       
+      }
+      init();
+      setFollower(profileData?.isFollow||false );
+    }
   }, []);
 
   const init = async () => {
     try {
-      const data = localStorage.getItem("uib");
-      const userId = JSON.parse(data || "")._id;
-      console.log("----->",userId)
-      const responseData = await fetchProfilePosts(userId, count);
-      setvideodata(responseData?.data);
+      if (profileData?._id) {
+        setData((prev) => ({
+          ...prev,
+          fname: profileData.indFirstName,
+          lname: profileData.indLastName,
+          desc: profileData.desc,
+          title: profileData.title,
+          dob: new Date(profileData.indDob),
+          gender: profileData.indGender,
+          email: profileData?.indEmail,
+          phone: profileData?.indMobileNum,
+        }));
+
+        const responseData = await fetchProfilePosts(profileData?._id, count);
+        setvideodata(responseData?.data);
+        const responseDataTagged = await fetchTaggedVideos(
+          profileData?._id,
+          count,
+        );
+
+        setTaggedVideo(responseDataTagged?.data);
+        // setFollower(profileData.isFollow)
+      }
     } catch (error) {
       console.error(error);
     }
@@ -130,16 +115,19 @@ const ProfilePage = ({ profileData }: ProfilePageProps) => {
 
   const getMoreData = async () => {
     try {
-      setCount(count + 10);
-      const data = localStorage.getItem("uib");
-      const userId = JSON.parse(data || "")._id;
-      const responseData = await fetchProfilePosts(userId, count + 10);
+      if (profileData?._id) {
+        setCount(count + 10);
+        const responseData = await fetchProfilePosts(
+          profileData?._id,
+          count + 10,
+        );
 
-      let newData = responseData?.data;
-      if (newData.length > 0) {
-        setvideodata(videoData.concat(newData));
-      } else {
-        return;
+        let newData = responseData?.data;
+        if (newData.length > 0) {
+          setvideodata(videoData.concat(newData));
+        } else {
+          return;
+        }
       }
     } catch (error) {
       console.error(error);
@@ -155,6 +143,79 @@ const ProfilePage = ({ profileData }: ProfilePageProps) => {
       await getMoreData();
     }
   }
+
+  const getMoreDatatagged = async () => {
+    try {
+      if (profileData?._id) {
+        setCount(count + 10);
+        const responseData = await fetchTaggedVideos(
+          profileData?._id,
+          count + 10,
+        );
+
+        let newData = responseData?.data;
+        if (newData.length > 0) {
+          setTaggedVideo(taggedVideo.concat(newData));
+        } else {
+          return;
+        }
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  async function handleScrollEventTagged(e: React.UIEvent<HTMLDivElement>) {
+    if (
+      e.currentTarget.clientHeight + e.currentTarget.scrollTop + 1 >=
+      e.currentTarget.scrollHeight
+    ) {
+      // setCount(count + 10);
+      await getMoreDatatagged();
+    }
+  }
+
+  const handleUnfollowUser = async () => {
+    const response = await unFollowUser(profileData?._id || "");
+    if (response.message === "Success.") {
+      setFollower(false);
+      init();
+    }
+  };
+
+  const handlefollowUser = async () => {
+    const response = await followUser(profileData?._id || "");
+    if (response.message === "Success.") {
+      setFollower(true);
+      init();
+    }
+  };
+console.log("dfplll",follower,profileData?.isFollow)
+  const reload = (
+    fname: string,
+    lname: string,
+    desc: string,
+    title: string,
+    dob: Date,
+    gender: string,
+    email: string | undefined,
+    phone: string | undefined,
+  ) => {
+    if (profileData) {
+      setData((prev) => ({
+        ...prev,
+        fname: fname,
+        lname: lname,
+        desc: desc,
+        title: title,
+        dob: new Date(dob),
+        gender: gender,
+        email: email,
+        phone: phone,
+      }));
+    }
+  };
+  console.log("follower state===>", follower);
   return (
     profileData && (
       <div className="min-h-screen p-4">
@@ -163,7 +224,9 @@ const ProfilePage = ({ profileData }: ProfilePageProps) => {
           {/* Profile Image */}
           <div className="flex-shrink-0">
             <Image
-              src={profileData?.data?.indPic?.original}
+              src={
+                profileData?.indPic?.original || "https://github.com/shadcn.png"
+              }
               width={500}
               height={500}
               alt="Profile Image"
@@ -172,159 +235,243 @@ const ProfilePage = ({ profileData }: ProfilePageProps) => {
           </div>
 
           {/* Profile Details */}
-          <div className="flex flex-col gap-2 flex-grow">
-            <p className="font-bold text-lg sm:text-xl md:text-2xl">
-              {profileData?.data?.indFirstName} {profileData?.data?.indLastName}
-            </p>
-            <div className="flex items-center gap-2 text-sm sm:text-md md:text-base text-muted-foreground">
-              <span>{profileData?.data?.userName}</span>
-              <span>{profileData?.data?.totalFollowers}</span>
-              <span>{profileData?.data?.totalPublishedPosts} Reviews</span>
+          <div className="flex flex-col gap-6 flex-grow">
+            <div className="flex flex-col px-4">
+              <p className="font-bold text-lg sm:text-xl md:text-2xl">
+                {data.fname} {data.lname}
+              </p>
+              <div 
+              style={{
+                paddingBlock:'4px'
+              }}
+              className="flex items-center gap-4">
+                <small className="text-base font-semibold text-gray-500">
+                  {profileData?.userName || "Username"}
+                </small>
+
+                <div className="flex gap-3">
+                  {!myProfile && (
+                    <Button
+                      variant='outline'
+                      className="hover:bg-transparent"
+                      onClick={async () => {
+                        if (follower) {
+                          // await  handlefollowUser();
+                          await handleUnfollowUser();
+                        } else {
+                          // await  handleUnfollowUser();
+                          await handlefollowUser();
+                        }
+                      }}
+                    >
+                      {follower ? "UnFollow" : "Follow"}
+                    </Button>
+                  )}
+
+                  {myProfile && (
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <Button
+                          variant={"ghost"}
+                          className="hover:bg-transparent font-bold hover:underline"
+                        >
+                          Edit profile
+                        </Button>
+                      </DialogTrigger>
+                      <EditProfile
+                        profileData={profileData}
+                        data={data}
+                        reload={reload}
+                      />
+                    </Dialog>
+                  )}
+                </div>
+              </div>
             </div>
-            <div className="max-w-[650px]">
+
+            <div className="flex justify-between items-start gap-4">
+              <div className="flex gap-2 text-base font-semibold text-gray-500">
+                <Button
+                  variant={"ghost"}
+                  className="hover:bg-transparent disabled:text-black dark:disabled:text-white"
+                  disabled
+                >
+                  <div className="flex flex-col">
+                    <span>{profileData?.totalPublishedPosts || 0} </span>
+                    <span>Reviews</span>
+                  </div>
+                </Button>
+
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button
+                      variant={"ghost"}
+                      className="hover:bg-transparent"
+                      disabled={!follower && !myProfile}
+                    >
+                      <div className="flex flex-col">
+                        <span>
+                          {!follower && !myProfile
+                            ? profileData?.totalFollowers || 0
+                            : profileData?.totalFollowers + 1}
+                        </span>
+                        <span> Followers</span>
+                      </div>
+                    </Button>
+                  </DialogTrigger>
+                  {follower && (
+                    <FollowersList
+                      id={profileData._id}
+                      usern={profileData.userName}
+                      followers={follower}
+                    />
+                  )}
+                </Dialog>
+
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button
+                      variant={"ghost"}
+                      className="hover:bg-transparent"
+                      disabled={!follower && !myProfile}
+                    >
+                      <div className="flex flex-col">
+                        <span> {profileData?.totalFollowing || 0}</span>
+                        <span>Followings</span>
+                      </div>
+                    </Button>
+                  </DialogTrigger>
+                  {follower && (
+                    <FollowingList
+                      id={profileData._id}
+                      usern={profileData.userName}
+                      followers={follower}
+                    />
+                  )}
+                </Dialog>
+              </div>
+            </div>
+
+            <div className="max-w-[650px] flex flex-col px-4 pb-6">
               <p className="text-md font-normal sm:text-base md:text-lg leading-tight">
-                {profileData?.data?.title}
+                {data?.title}
               </p>
-              <p className="text-sm sm:text-md md:text-base text-muted-foreground mt-2">
-                {profileData?.data?.desc}
+              <p className="text-sm sm:text-md md:text-base text-muted-foreground mb-2">
+                {data?.desc}
               </p>
-            </div>
-            <div className="flex items-center mt-1 gap-2">
-              {Array.from({ length: 5 }).map((_, index) => (
-                <Star
-                  key={index}
-                  className={`w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 ${
-                  index < Math.round(profileData?.data?.avgRating || 0)
-                      ? "text-orange-500"
-                      : "text-gray-500"
-                  }`}
-                />
-              ))}
-              <span className="text-xs sm:text-sm md:text-base">
-                <span className="text-green-500">
-                  {profileData?.data?.avgRating}/5
-                </span>{" "}
-                on{" "}
-                <span className="text-red-500">
-                  {profileData?.data?.totalRating}
-                </span>{" "}
-                Ratings
-              </span>
+
+              {/* rating */}
+              <div className="flex items-center mt-1 gap-2">
+                {Array.from({ length: 5 }).map((_, index) => (
+                  <Star
+                    key={index}
+                    className={`w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 ${
+                    index < Math.round(profileData?.avgRating || 0)
+                        ? "text-orange-500"
+                        : "text-gray-500"
+                    }`}
+                  />
+                ))}
+                <span className="text-xs sm:text-sm md:text-base">
+                  <span className="text-green-500">
+                    {profileData?.avgRating}/5
+                  </span>{" "}
+                  on{" "}
+                  <span className="text-red-500">
+                    {profileData?.totalRating || 0}
+                  </span>{" "}
+                  Ratings
+                </span>
+              </div>
             </div>
           </div>
 
           {/* Social Icons */}
-          <div className="social-icons flex sm:flex-col ms-4 mt-1 items-center justify-center sm:mt-0">
-            <Link href={profileData.data.socialUrls.whatsapp}>
-              {" "}
-              <Image
-                className="mb-2 mr-5"
-                src="/whatsApp-logo.png"
-                alt="social-icon"
-                height={50}
-                width={40}
-              />{" "}
-            </Link>
-            {/* <Link href="http://">
-            {" "}
-            <Image
-              className="mb-2 mr-5"
-              src="/facebook-logo.png"
-              alt="social-icon"
-              height={50}
-              width={40}
-            />{" "}
-          </Link> */}
-            <Link href={profileData.data.socialUrls.twitter}>
-              {" "}
-              <Image
-                className="mb-2 mr-5"
-                src="/twitter-old-logo.png"
-                alt="social-icon"
-                height={50}
-                width={40}
-              />{" "}
-            </Link>
-            <Link href={profileData.data.socialUrls.instagram}>
-              {" "}
-              <Image
-                className="mb-2 mr-5"
-                src="/Instagram-logo.png"
-                alt="social-icon"
-                height={50}
-                width={40}
-              />{" "}
-            </Link>
-            <Link href={profileData.data.socialUrls.linkedin}>
-              {" "}
-              <Image
-                className="mb-2 mr-5"
-                src="/Linkedin-logo.png"
-                alt="social-icon"
-                height={50}
-                width={40}
-              />{" "}
-            </Link>
-          </div>
+          <SocialMedia profileData={profileData} />
         </div>
 
-        {/* Tab Navigation */}
-        <div className="py-4">
-          <div className="flex justify-evenly cursor-pointer">
-            {/* POSTS */}
-            <div className="flex items-center gap-2">
-              <Grip className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6" />
-              <span className="text-xs sm:text-sm md:text-base">POSTS</span>
-            </div>
-
-            {/* TAG */}
-            <div className="flex items-center gap-2">
-              <Tag className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6" />
-              <span className="text-xs sm:text-sm md:text-base">TAG</span>
-            </div>
-
-            {/* SAVED */}
-            {/* <div className="flex items-center gap-2">
-              <Bookmark className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6" />
-              <span className="text-xs sm:text-sm md:text-base">SAVED</span>
-            </div> */}
-          </div>
-        </div>
-
-        <Separator />
-
-        {/* Posts Section */}
-        <div className="py-6">
-          <div className="flex w-full justify-center">
-            {/* <div>No Posts Available, start posting to see!!!</div>
-             */}
-
-            <ScrollArea
-              className="h-full w-full pb-36"
-              ref={scrollContainerRef}
-              onScroll={handleScrollEvent}
+        <Tabs defaultValue="posts" className="w-full">
+          <TabsList className="w-full flex items-center justify-center bg-black">
+            <TabsTrigger
+              value="posts"
+              className="text-xs sm:text-sm md:text-base w-full"
             >
-              <div className="flex flex-wrap w-full h-full gap-3">
-                {videoData.length > 0 || !videoData ? (
-                  videoData.map((item: videoData, index: number) => (
-                    <ProfileItem
-                      data={item}
-                      key={index}
-                      height={1000}
-                      width={1000}
-                      className="w-[100px] h-[200px] sm:w-[140px] sm:h-[300px] lg:w-[190px] lg:h-[380px]"
-                      aspectRatio="portrait"
-                    />
-                  ))
-                ) : (
-                  <div className="w-full text-center">no data</div>
-                )}
-              </div>
+              POSTS
+            </TabsTrigger>
+            <TabsTrigger
+              value="tag"
+              className="text-xs sm:text-sm md:text-base w-full"
+            >
+              TAG
+            </TabsTrigger>
+          </TabsList>
+          <TabsContent value="posts">
+            <Separator />
 
-              <ScrollBar orientation="vertical" />
-            </ScrollArea>
-          </div>
-        </div>
+            {/* Posts Section */}
+            <div className="py-6">
+              <div className="flex w-full justify-center">
+                <ScrollArea
+                  className="h-full w-full pb-36"
+                  ref={scrollContainerRef}
+                  onScroll={handleScrollEvent}
+                >
+                  <div className="flex flex-wrap w-full h-full gap-3 lg:gap-5">
+                    {videoData.length > 0 || !videoData ? (
+                      videoData.map((item: VideoData, index: number) => (
+                        <ProfileItem
+                          data={item}
+                          key={index}
+                          height={1000}
+                          width={1000}
+                          className="w-[127px] h-[200px] sm:w-[140px] sm:h-[300px] lg:w-[220px] lg:h-[380px]"
+                          aspectRatio="portrait"
+                        />
+                      ))
+                    ) : (
+                      <div className="w-full text-center">no data</div>
+                    )}
+                  </div>
+
+                  <ScrollBar orientation="vertical" />
+                </ScrollArea>
+              </div>
+            </div>
+          </TabsContent>
+          <TabsContent value="tag">
+            <Separator />
+
+            {/* Tgged Section */}
+            <div className="py-6">
+              <div className="flex w-full justify-center">
+                <ScrollArea
+                  className="h-full w-full pb-36"
+                  ref={scrollContainerRef}
+                  onScroll={handleScrollEventTagged}
+                >
+                  <div className="flex flex-wrap w-full h-full gap-3 lg:gap-5">
+                    {taggedVideo.length > 0 || !taggedVideo ? (
+                      taggedVideo.map((item: VideoData, index: number) => (
+                        <ProfileItem
+                          data={item}
+                          key={index}
+                          height={1000}
+                          width={1000}
+                          className="w-[127px] h-[200px] sm:w-[140px] sm:h-[300px] lg:w-[220px] lg:h-[380px]"
+                          aspectRatio="portrait"
+                        />
+                      ))
+                    ) : (
+                      <div className="w-full text-center">no data</div>
+                    )}
+                  </div>
+
+                  <ScrollBar orientation="vertical" />
+                </ScrollArea>
+              </div>
+            </div>
+          </TabsContent>
+        </Tabs>
       </div>
     )
   );

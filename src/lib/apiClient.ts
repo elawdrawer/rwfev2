@@ -1,9 +1,11 @@
+import { AxiosError } from "axios";
 import axiosInstance from "./api";
 
 interface ApiResponse<T = any> {
   success: boolean;
   data?: T;
   error?: string;
+  status:number;
 }
 
 export async function apiClient<T = any>(
@@ -31,12 +33,14 @@ export async function apiClient<T = any>(
     const response = await axiosInstance(config);
 
     return {
+      status:response.status,
       success: true,
       data: response.data,
     };
-  } catch (error: any) {
-    console.error(`API call to ${endpoint} failed:`, error.message);
+  } catch (error:any) {
+    console.error(`API call to ${endpoint} failed:`, error.message );
     return {
+      status:error.statusCode,
       success: false,
       error: error.message || "Something went wrong",
     };

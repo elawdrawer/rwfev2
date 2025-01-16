@@ -44,11 +44,11 @@ export async function signInWithMobile(
     if (response.status === 200) {
       return { status: true, message: response.data };
     } else {
-      return { status: false, message: response.data };
+      return { status: false, message: response.data.message };
     }
   } catch (error: any) {
     // console.error("error", error.response);
-    return {status:false,message:error.message};  }
+    return {status:false,message:error.response.data.message} }
 }
 
 export async function signInWithEmail(password: string, email: string,  fingerPrint:string,latitude:string,longitude:string) {
@@ -85,11 +85,11 @@ export async function signInWithEmail(password: string, email: string,  fingerPr
     if (response.status === 200) {
       return { status: true, message: response.data };
     } else {
-      return { status: false, message: response.data };
+      return { status: false, message: response.data.message };
     }
   } catch (error: any) {
     console.error("error", error);
-    return {status:false,message:error.message};  }
+    return {status:false,message:error.response.data.message}  }
 }
 
 export async function signInWithUserName(password: string, userName: string,  fingerPrint:string,latitude:string,longitude:string) {
@@ -126,10 +126,10 @@ export async function signInWithUserName(password: string, userName: string,  fi
     if (response.status === 200) {
       return { status: true, message: response.data };
     } else {
-      return { status: false, message: response.data };
+      return { status: false, message: response.data.message};
     }
   } catch (error: any) {
     // console.error("error", error.response);
-    return {status:false,message:error.message};
+    return {status:false,message:error.response.data.message}
   }
 }

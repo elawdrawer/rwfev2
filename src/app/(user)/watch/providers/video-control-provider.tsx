@@ -32,10 +32,12 @@ export function useVideoContext() {
 
 interface VideoControlsProviderProps {
   children: ReactNode;
+  onVideoEnd?: () => void;
 }
 
 export function VideoControlsProvider({
   children,
+  onVideoEnd,
 }: VideoControlsProviderProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -54,6 +56,7 @@ export function VideoControlsProvider({
     const handleError = () => {
       console.error("Video playback error");
       setIsPlaying(false);
+      onVideoEnd?.();
     };
 
     video.addEventListener("play", handlePlay);
@@ -84,15 +87,15 @@ export function VideoControlsProvider({
     // attemptAutoplay();
 
     return () => {
-      video.removeEventListener('play', handlePlay);
-      video.removeEventListener('playing', handlePlaying);
-      video.removeEventListener('pause', handlePause);
-      video.removeEventListener('ended', handleEnded);
-      video.removeEventListener('waiting', handleWaiting);
-      video.removeEventListener('error', handleError);
-      video.removeEventListener('volumechange', handleVolumeChange);
+      video.removeEventListener("play", handlePlay);
+      video.removeEventListener("playing", handlePlaying);
+      video.removeEventListener("pause", handlePause);
+      video.removeEventListener("ended", handleEnded);
+      video.removeEventListener("waiting", handleWaiting);
+      video.removeEventListener("error", handleError);
+      video.removeEventListener("volumechange", handleVolumeChange);
     };
-  }, []);
+  }, [onVideoEnd]);
 
   const togglePlay = async () => {
     const video = videoRef.current;

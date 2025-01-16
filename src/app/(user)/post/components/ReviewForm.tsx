@@ -23,7 +23,7 @@ import {
   onUploadSuccess,
   onUploadVideoThumbnail,
 } from "@/apis/post";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 const STEPS = [
@@ -40,6 +40,8 @@ const INITIAL_QUESTIONS: Question[] = [
 ];
 
 export function ReviewForm() {
+  const searchParams = useSearchParams();
+  const businessID = searchParams.get("data") || "";
   const [step, setStep] = useState(1);
   const [videoUrl, setVideoUrl] = useState("");
   const [videoFile, setVideoFile] = useState<File | null>(null);
@@ -55,7 +57,7 @@ export function ReviewForm() {
 
   const router = useRouter();
   const isMobile = useIsMobile();
-  console.log("checking videoUrl", thumbnailFile);
+  console.log("checking videoUrl", businessID);
 
   const averageRating =
     questions.reduce((acc, q) => acc + q.rating, 0) / questions.length;
@@ -104,6 +106,7 @@ export function ReviewForm() {
         isPlaces: category === "place",
         title,
         uploaderRating: ratingsObject,
+        ...(businessID && { businessPageId: businessID }),
       };
 
       // Get signed URL
@@ -198,7 +201,7 @@ export function ReviewForm() {
                   setThumbnailFile(file);
                 }}
                 onNext={() => setStep(3)}
-                setStep={setStep}
+                // setStep={setStep}
               />
               {/* <div className="flex justify-end gap-4">
                 <Button variant="outline" onClick={() => setStep(1)}>

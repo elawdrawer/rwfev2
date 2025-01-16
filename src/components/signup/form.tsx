@@ -68,12 +68,12 @@ export default function SignupForm() {
         : "90";
       const signUp = await signup(signupForm,latitude,longitude);
       console.log(":::::::=>", signUp);
-      if (signUp.success) {
+      if (signUp.status) {
         router.push("/login");
       }
 
-      if (signUp.error) {
-        setMessage(signUp.error);
+      if (!signUp.status) {
+        setMessage(signUp.message);
       }
     } else {
       setStep({
@@ -97,10 +97,10 @@ export default function SignupForm() {
         />
       </div>
       <div
-        className="flex-1 flex-col w-1/3 space-y-14 px-4 py-12 sm:px-6 xl:flex-none xl:px-20
+        className="flex-1 flex-col w-1/3 space-y-9 px-4 py-12 sm:px-6 xl:flex-none xl:px-20
           min-h-screen"
       >
-        <div className="mx-auto py-4">
+        <div className="mx-auto pt-4">
           <div className="flex flex-col items-center">
             <Image
               alt="Rewardwale"

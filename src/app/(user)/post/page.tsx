@@ -1,12 +1,14 @@
-'use client'
+"use client";
 import { Suspense } from "react";
 import { Sidebar } from "../home/components/sidebar";
 import { ReviewForm } from "../post/components/ReviewForm";
 import SearchInputContainer from "../search/components/search-Input-component";
 import { Header } from "../home/components/header";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useSearchParams } from "next/navigation";
 
 export default function HomePage() {
+
 
   const isMobie = useIsMobile();
   return (
@@ -30,5 +32,3 @@ export default function HomePage() {
     </div>
   );
 }
-
-//reference needed

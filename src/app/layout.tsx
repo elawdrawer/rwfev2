@@ -5,6 +5,8 @@ import { ThemeProvider as NextThemesProvider } from "next-themes";
 import ThemeDataProvider from "@/context/theme-data-provider";
 import { Header } from "@/components/layout";
 import LayoutWrapper from "@/components/layout/layout-wrapper";
+import { Toaster } from "sonner";
+import { GoogleOAuthProvider } from "@react-oauth/google";
 
 export const metadata: Metadata = {
   title: "RewardWale - Review honestly Rate diligently Earn Rewards",
@@ -24,6 +26,7 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body>
+        <Toaster position="top-center" richColors />
         <NextThemesProvider
           attribute="class"
           defaultTheme="system"
@@ -32,7 +35,10 @@ export default function RootLayout({
         >
           <ThemeDataProvider>
             <LayoutWrapper>
-              <div className="container mx-auto">{children}</div>
+              <GoogleOAuthProvider clientId={process.env.GOOGLE_CLIENT_ID!}>
+                <div className="container mx-auto">{children}</div>
+              </GoogleOAuthProvider>{" "}
+              F
             </LayoutWrapper>
           </ThemeDataProvider>
         </NextThemesProvider>

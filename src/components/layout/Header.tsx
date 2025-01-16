@@ -4,6 +4,10 @@ import React, { useEffect } from "react";
 import Image from "next/image";
 import { useState } from "react";
 import { useRouter } from "../../hooks/use-router";
+import blackLogo from "../../../public/brand_logo/PNG/RW_Black_Name.png";
+import whiteLogo from "../../../public/brand_logo/PNG/RW_White_Name.png";
+import { ThemeModeToggle } from "../theme-mode-toggle";
+import { Button } from "../ui/button";
 
 const Navbar = () => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -27,24 +31,31 @@ const Navbar = () => {
   return (
     <div>
       {/* Navbar */}
-      <nav className="flex items-center justify-between p-4 bg-white border-b-2 border-slate-200">
+      <nav className="flex items-center justify-between p-4 border-b-2">
         {/* Left Section: Logo */}
         <div className="flex items-center">
-          <div onClick={() => router.push("/")}>
+          <div
+            onClick={() => router.push("/")}
+            onKeyUp={(e) => {
+              if (e.key === "Enter") router.push("/");
+            }}
+            tabIndex={0}
+            role="button"
+          >
             <Image
-              style={{ marginBottom: "7px" }}
-              src={
-                "https://rewardwale.com/_next/image?url=%2F_next%2Fstatic%2Fmedia%2FRW_Black_Logo.86498c6e.png&w=256&q=75"
-              }
-              className="cursor-pointer"
-              width={90}
-              height={2}
-              alt="Brand logo"
+              alt="Rewardwale"
+              src={whiteLogo}
+              className="w-[160px] hidden dark:inline"
+            />
+            <Image
+              alt="Rewardwale"
+              src={blackLogo}
+              className="w-[160px] inline dark:hidden"
             />
           </div>
 
           {/* Desktop Links */}
-          <div className="hidden md:flex space-x-6 ml-10">
+          {/* <div className="hidden md:flex space-x-6 ml-10">
             <a
               className="text-gray-600 hover:text-gray-900 cursor-pointer"
               onClick={() => router.push("/about-us")}
@@ -63,7 +74,7 @@ const Navbar = () => {
             >
               How it Works
             </a>
-          </div>
+          </div> */}
         </div>
 
         {/* Right Section: Search and Login */}
@@ -96,17 +107,18 @@ const Navbar = () => {
               </svg>
             </button>
           </div> */}
-
+          <div className="hidden md:flex items-center space-x-4">
+            <ThemeModeToggle />
+          </div>
           {/* Login Button */}
-          <button
+          <Button
             onClick={() => {
               isLoggedIn ? router.push("/home") : router.push("/login");
             }}
-            // onClick={()=> router.push('/home')}
-            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+            className="px-4 py-2 rounded-md hover:bg-blue-700"
           >
             {isLoggedIn ? "Home" : "Log In"}
-          </button>
+          </Button>
 
           {/* Hamburger Menu (Mobile only) */}
           <button

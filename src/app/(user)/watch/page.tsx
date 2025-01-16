@@ -13,7 +13,7 @@ import { ScrollButton } from "./components/scroll-button";
 interface VideoDetails {
   _id: string;
   videoId: string;
-  userId:string;
+  userId: string;
   title: string;
   cdnVideoPath: string;
   cdnThumbPath: string[];
@@ -34,7 +34,7 @@ interface VideoDetails {
   isBookmarked: boolean;
   categoryId: string;
   totalComments: number;
-  isFollowed:boolean;
+  isFollowed: boolean;
 }
 
 export default function WatchPage() {
@@ -154,7 +154,7 @@ export default function WatchPage() {
             </div>
           </div>
         </div>
-{/* 
+        {/* 
         <div
           style={{
             zIndex: "9999",
