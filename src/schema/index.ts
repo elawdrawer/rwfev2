@@ -1,5 +1,4 @@
 import { checkUserNameAvailability } from "@/apis/signUp";
-import { debounce } from "lodash";
 import * as z from "zod";
 
 export const LoginSchema = z.object({
@@ -314,16 +313,6 @@ export const EditPersonalInfoFormSchema = z.object({
     )
 });
 
-const checkUsername = debounce(async (username, ctx) => {
-  const response = await checkUserNameAvailability(username, "90", "90");
-
-  if (!response?.status) {
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      message: response?.message || "User name already exists.",
-    });
-  }
-}, 500); // Delay of 500ms
 
 export const newSignupSchema = z.object({
   firstname: z

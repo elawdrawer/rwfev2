@@ -12,7 +12,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useDropzone } from "react-dropzone";
+// import { useDropzone } from "react-dropzone";
 import { ProfileDataProps } from "./dataTypes";
 import { toast } from "sonner";
 import { Pen, Share2Icon } from "lucide-react";
