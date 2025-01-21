@@ -41,6 +41,7 @@ export async function signInWithMobile(
         timeout: 10000, // Include timeout as part of the Axios config
       },
     );
+    console.log("response::::::::",response)
     if (response.status === 200) {
       return { status: true, message: response.data };
     } else {
@@ -48,7 +49,7 @@ export async function signInWithMobile(
     }
   } catch (error: any) {
     // console.error("error", error.response);
-    return {status:false,message:error.response.data.message} }
+    return {status:false,message:error.response.data.message};   }
 }
 
 export async function signInWithEmail(password: string, email: string,  fingerPrint:string,latitude:string,longitude:string) {
@@ -60,7 +61,7 @@ export async function signInWithEmail(password: string, email: string,  fingerPr
         indEmail: email,
         indPwd: password,
         // userName: "",
-        isBusinessUser: false,
+        // isBusinessUser: false,ss
         indPushNotify: true,
         notificationObj: {
           endpoint: "signin",
@@ -82,14 +83,16 @@ export async function signInWithEmail(password: string, email: string,  fingerPr
         timeout: 10000, // Include timeout as part of the Axios config
       },
     );
+    console.log("response::::::::",response)
     if (response.status === 200) {
+
       return { status: true, message: response.data };
     } else {
       return { status: false, message: response.data.message };
     }
   } catch (error: any) {
-    console.error("error", error);
-    return {status:false,message:error.response.data.message}  }
+    console.error("error", error.response.data.message);
+    return {status:false,message:error.response.data.message};  }
 }
 
 export async function signInWithUserName(password: string, userName: string,  fingerPrint:string,latitude:string,longitude:string) {
@@ -123,6 +126,7 @@ export async function signInWithUserName(password: string, userName: string,  fi
         timeout: 10000, // Include timeout as part of the Axios config
       },
     );
+    console.log("response::::::::",response)
     if (response.status === 200) {
       return { status: true, message: response.data };
     } else {

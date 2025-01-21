@@ -1,11 +1,15 @@
 "use server";
 import axios, { AxiosError } from "axios";
 
-export async function checkUserNameAvailability(userName: string,latitude:string,longitude:string) {
-  console.log("checkUserNameAvailability\t",userName)
+export const checkUserNameAvailability = async (
+  userName: string,
+  latitude: string,
+  longitude: string,
+) => {
+  console.log("checkUserNameAvailability\t", userName);
   try {
     const response = await axios.get(
-      `${process.env.NEXT_PUBLIC_API_BASE_URL}api/userNameAvailability/${userName}?isBusinessUser=false&type=user`,
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}api/userNameAvailability/${userName}?type=user`,
       {
         headers: {
           "Content-Type": "application/json",
@@ -17,23 +21,31 @@ export async function checkUserNameAvailability(userName: string,latitude:string
         timeout: 10000, // Include timeout as part of the Axios config
       },
     );
-console.log("response:::",response)
+    console.log("response:::", response.data.data);
     if (response.status === 200) {
       if (response.data.data.isAvailable) {
-        return {status:true,message:response.data.message};
+        return { status: true, message: response.data.message };
       } else if (!response.data.data.isAvailable) {
-        return {status:false,message:"User Name already exists!,try new"};
+        return {
+          status: false,
+          message: "User Name already exists!,try new",
+        };
       }
     } else {
-      return {status:false,message:response.data.message};
+      return { status: false, message: response.data.message };
     }
   } catch (error: any) {
-    console.log("error\n\t",error)
+    console.log("error\n\t", error);
     console.error("error", error.response);
     return {status:false,message:error.response.data.message}  }
 }
 
-export async function validateEmail(email: string,  fingerPrints:string,latitude:string,longitude:string) {
+export async function validateEmail(
+  email: string,
+  fingerPrints: string,
+  latitude: string,
+  longitude: string,
+) {
   console.log("validateEmail", email);
   //   const response = await  apiClient(`/validateEmail/${email}`, "GET");
   try {
@@ -54,16 +66,23 @@ export async function validateEmail(email: string,  fingerPrints:string,latitude
       },
     );
     if (response.status === 200) {
-      return {status:true,message:response.data.message};
+      return { status: true, message: response.data.message };
     } else {
-      return {status:false,message:response.data.message};
+      return { status: false, message: response.data.message };
     }
   } catch (error: any) {
-console.log("error\n\t",error)
-return {status:false,message:error.response.data.message}  }
+    console.log("error\n\t", error);
+    return { status: false, message: error.response.data.message };
+  }
 }
 
-export async function validatePhone(countryCode: string, mobile: string,  fingerPrints:string,latitude:string,longitude:string) {
+export async function validatePhone(
+  countryCode: string,
+  mobile: string,
+  fingerPrints: string,
+  latitude: string,
+  longitude: string,
+) {
   console.log("validatePhone\t", countryCode, mobile);
   try {
     console.log(
@@ -83,27 +102,26 @@ export async function validatePhone(countryCode: string, mobile: string,  finger
       },
     );
     if (response.status === 200) {
-      return {status:true,message:response.data.message};
+      return { status: true, message: response.data.message };
     } else {
-      return {status:false,message:response.data.message};
+      return { status: false, message: response.data.message };
     }
   } catch (error: any) {
-    console.log("error\n\t",error)
-    return {status:false,message:error.response.data.message} }
+    console.log("error\n\t", error);
+    return { status: false, message: error.response.data.message };
+  }
 }
 
 export async function verifyOTPMobile(
   code: string,
   number: string,
   otp: string,
-  fingerPrints:string,
-  latitude:string,
-  longitude:string
+  fingerPrints: string,
+  latitude: string,
+  longitude: string,
 ) {
   console.log("verifyOTPMobile\n");
   try {
-
- 
     console.log(
       `${process.env.NEXT_PUBLIC_API_BASE_URL}api/verifyOTP?countryCode=${code}&phoneNumber=${number}&otp=${otp}`,
     );
@@ -127,10 +145,17 @@ export async function verifyOTPMobile(
     }
   } catch (error: any) {
     console.error("error\n\t", error);
-    return {status:false,message:error.response.data.message}  }
+    return { status: false, message: error.response.data.message };
+  }
 }
 
-export async function verifyOTPEmail(otp: string, email: string,  fingerPrints:string,latitude:string,longitude:string) {
+export async function verifyOTPEmail(
+  otp: string,
+  email: string,
+  fingerPrints: string,
+  latitude: string,
+  longitude: string,
+) {
   console.log("verifyOTPEmail\n");
   try {
     console.log(
@@ -155,26 +180,26 @@ export async function verifyOTPEmail(otp: string, email: string,  fingerPrints:s
       return { status: false, message: response.data.message };
     }
   } catch (error: any) {
-    console.error("error\n\t",error);
-    return {status:false,message:error.response.data.message}  }
+    console.error("error\n\t", error);
+    return { status: false, message: error.response.data.message };
+  }
 }
 
-export async function signup(value: {
-  firstName: string;
-  lastName: string;
-  dateOfBirth: string;
-  city: string;
-  gender: string;
-  email: string;
-  mobile: string;
-  userName: string;
-  password: string;
-  fingerPrints:string;
-
-},  latitude:string,
-longitude:string) {
+export async function signup(
+  value: {
+    firstName: string;
+    lastName: string;
+    email: string;
+    userName: string;
+    mobile: string;
+    password: string;
+    fingerPrints: string;
+  },
+  latitude: string,
+  longitude: string,
+) {
   try {
-    console.log("Signup\n",value)
+    console.log("Signup\n", value);
     console.log(`${process.env.NEXT_PUBLIC_API_BASE_URL}api/signup`);
     const response = await axios.post(
       `${process.env.NEXT_PUBLIC_API_BASE_URL}api/signup`,
@@ -182,22 +207,21 @@ longitude:string) {
         indFirstName: value.firstName,
         indLastName: value.lastName,
         userName: value.userName,
-        indGender: value.gender,
-        indDob: value.dateOfBirth.replace(/^"|"$/g, ""),
-        location: value.city,
         locationCoordinates: {
-          latitude: 90,
-          longitude: 180,
+          latitude: latitude,
+          longitude: longitude,
         },
         indEmail: value.email,
         indPwd: value.password,
+        location:"karnataka",
         indCountryCode: "91",
         indMobileNum: value.mobile,
+        // indDob: "",
+        // indGender: "Male",
         indEmailNotify: true,
         indMobileNotify: true,
         indPushNotify: true,
         indWhatsappNotify: true,
-        // categoryPref: ["string78wh36sfyeh8012347"],
         notificationObj: {
           endpoint: "/signup",
           expirationTime: "string",
@@ -206,7 +230,6 @@ longitude:string) {
             auth: "string",
           },
         },
-        // socialProviderToken: "string",
       },
       {
         headers: {
@@ -225,10 +248,10 @@ longitude:string) {
       return {status:false,message:response.data.message}; 
     }
   } catch (error: any) {
-    console.log("error\n\t", error.response.data );
-    return {status:false,message:error.response.data.message};  }
+    console.log("error\n\t", error);
+    return { status: false, message: error.response.data.message };
+  }
 }
-
 
 export async function resendOTPEmail( email: string,  fingerPrints:string,latitude:string,longitude:string) {
   console.log("resendOTPEmail\n",email,fingerPrints,latitude,longitude);
@@ -255,22 +278,20 @@ export async function resendOTPEmail( email: string,  fingerPrints:string,latitu
       return { status: false, message: response.data.message };
     }
   } catch (error: any) {
-    console.error("error\n\t",error, error.response.data);
-    return {status:false,message:error.response.data.message};  }
+    console.error("error\n\t", error, error.response.data);
+    return { status: false, message: error.response.data.message };
+  }
 }
-
 
 export async function resendOTPMobile(
   code: string,
   number: string,
-  fingerPrints:string,
-  latitude:string,
-  longitude:string
+  fingerPrints: string,
+  latitude: string,
+  longitude: string,
 ) {
   console.log("resendOTPMobile\n");
   try {
-
- 
     console.log(
       `${process.env.NEXT_PUBLIC_API_BASE_URL}api/resendOTP?countryCode=${code}&phoneNumber=${number}`,
     );
@@ -293,6 +314,76 @@ export async function resendOTPMobile(
       return { status: false, message: response.data.message };
     }
   } catch (error: any) {
-    console.error("error\n\t", error,error.response.data);
-    return {status:false,message:error.response.data.message};  }
+    console.error("error\n\t", error, error.response.data);
+    return { status: false, message: error.response.data.message };
+  }
+}
+
+export async function signupWithProvider(
+  value: {
+    firstName: string;
+    lastName: string;
+    email: string;
+    userName: string;
+    mobile: string;
+    fingerPrints: string;
+  },
+  latitude: string,
+  longitude: string,
+  providerToken: string,
+  provider: string,
+) {
+  try {
+    console.log(
+      "Signup\n",
+      value,
+      latitude,
+      longitude,
+      providerToken,
+      provider.toLocaleUpperCase(),
+    );
+    console.log(`${process.env.NEXT_PUBLIC_API_BASE_URL}api/signup`);
+    const response = await axios.post(
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}api/signupWithSocialProvider`,
+      {
+        indFirstName: value.firstName,
+        indLastName: value.lastName,
+        userName: value.userName,
+        location: "chennai",
+        locationCoordinates: {
+          latitude: latitude,
+          longitude: longitude,
+        },
+        indEmail: value.email,
+        indCountryCode: "91",
+        indDob: "2000-01-11",
+        indGender: "male",
+        indMobileNum: value.mobile,
+        indEmailNotify: true,
+        indMobileNotify: true,
+        indPushNotify: true,
+        indWhatsappNotify: true,
+        socialProviderType: "GOOGLE",
+        socialProviderToken: providerToken,
+      },
+      {
+        headers: {
+          "Content-Type": "application/json",
+          fingerprint: value.fingerPrints,
+          latitude: latitude,
+          longitude: longitude,
+          lan: "en",
+        },
+        timeout: 10000,
+      },
+    );
+    if (response.status === 200) {
+      return { status: true, message: "successfully created" };
+    } else {
+      return { status: false, message: "Signup isnt successful" };
+    }
+  } catch (error: any) {
+    console.log("error\n\t", error.response.data);
+    return { status: false, message: error.response.data.message };
+  }
 }

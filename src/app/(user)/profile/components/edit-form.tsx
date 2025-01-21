@@ -41,7 +41,7 @@ interface Props {
     SocialUrls: {
       whatsapp: string;
       linkedin: string;
-      facebook: string;
+      // facebook: string;
       instagram: string;
       twitter: string;
     };
@@ -58,7 +58,7 @@ interface Props {
     phone: string,
     whatsapp: string,
     linkedin: string,
-    facebook: string,
+  
     instagram: string,
     twitter: string,
   ) => void;
@@ -85,7 +85,7 @@ export default function EditForm({ data, reload, profileData }: Props) {
       instagram: data.SocialUrls.instagram,
       twitter: data.SocialUrls.twitter,
       linkdin: data.SocialUrls.linkedin,
-      facebook: data.SocialUrls.facebook,
+
     },
   });
 
@@ -109,15 +109,15 @@ export default function EditForm({ data, reload, profileData }: Props) {
               values.desc || "",
               values.title || "",
               new Date(values.dob),
-
               values.gender,
               values.email,
               values.mobile,
               values.watsapp || "",
+              values.linkdin || "",
               values.instagram || "",
               values.twitter || "",
-              values.linkdin || "",
-              values.facebook || "",
+              
+        
             );
           }
 

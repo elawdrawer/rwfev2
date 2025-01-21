@@ -119,6 +119,18 @@ export const getfollowerList = async (id: string, count: number) => {
   }
 };
 
+export const uploadProfileImage = async ( formdata:FormData) => {
+
+  const response = await apiClient(`/uploadProfileImage`, "PUT",formdata);
+  console.log("uploadProfileImage", response);
+  if (response.success && response.data) {
+    return response.data;
+  } else {
+    console.error("Failed to fetch landing page data:", response.error);
+    return null;
+  }
+};
+
 export const updateUserProfile = async (value: {
   email: string;
   lastname: string;
@@ -131,8 +143,8 @@ export const updateUserProfile = async (value: {
   watsapp: string | undefined;
   instagram: string | undefined;
   twitter: string | undefined;
-  facebook: string | undefined;
-  linkdin:string|undefined;
+  // facebook: string | undefined;
+  linkdin: string | undefined;
 }) => {
   console.log("profile data::::::::", value.dob);
   const response = await apiClient(`/profile`, "PUT", {
@@ -153,8 +165,8 @@ export const updateUserProfile = async (value: {
     socialUrls: {
       whatsapp: value.watsapp,
       linkedin: value.linkdin,
-      facebook: value.facebook,
-      instagram:value.instagram,
+      facebook: "",
+      instagram: value.instagram,
       twitter: value.twitter,
     },
   });
@@ -189,6 +201,37 @@ export const getfollowingList = async (id: string, count: number) => {
     return response.data;
   } else {
     console.error("Failed to fetch followingList data:", response.error);
+    return null;
+  }
+};
+
+export const postShareUrl = async (url: string) => {
+  const path = `${process.env.NEXT_PUBLIC_BASE_URL}${url}`;
+  console.log("path::::=>", path);
+  const response = await apiClient(`/shorten`, "POST", { originalUrl: path });
+
+  if (response.success && response.data) {
+    return response.data;
+    // return {
+    //   data: {
+    //     shortUrl: "https://rewl.in/CLTc5",
+    //     expirationDate: "2025-01-24T07:12:40.612Z",
+    //   },
+    // }
+    // };
+  } else {
+    console.error("Failed to fetch postShareUrl data:", response.error);
+    return null;
+  }
+};
+
+export const getShareUrl = async (shortCode: string) => {
+  const response = await apiClient(`${shortCode}`, "GET");
+
+  if (response.success && response.data) {
+    return response.data;
+  } else {
+    console.error("Failed to fetch postShareUrl data:", response.error);
     return null;
   }
 };

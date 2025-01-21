@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import ProfilePage from "../components/profile-page";
 
 import {
@@ -19,6 +19,8 @@ export default function OthersPage() {
   const [data, setData] = useState<any>(null);
   const [userId, setUserId] = useState<any>(null);
   const [postData, setPostData] = useState([]);
+    const scrollContainerRef = useRef<HTMLDivElement | null>(null);
+  
   const pathName = usePathname();
 
   const isMobile = useIsMobile();
@@ -39,11 +41,38 @@ export default function OthersPage() {
   //   username: "Lokesh",
   // };
 
+  const handleTouchStart = () => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.style.overflow = "auto";
+      setTimeout(() => {
+        if (scrollContainerRef.current) {
+          scrollContainerRef.current.style.overflow = "hidden";
+        }
+      }, 10000); // Adjust the delay in milliseconds (e.g., 3000ms = 3 seconds)
+    }
+  };
+
   return (
-    <div className="flex bg-background  h-screen  overflow-hidden ">
+    <div className="flex bg-background  h-screen"
+
+    >
       {!isMobile && <Sidebar />}
       
-      <div className="flex-1 h-full overflow-y-scroll">
+      <div className="flex-1 h-screen max-sm:overflow-y-scroll max-sm:overscroll-none"
+          ref={scrollContainerRef}
+          // onScroll={handleScrollEvent}
+          onMouseEnter={(e) =>
+           { 
+     
+            Object.assign(e.currentTarget.style, { overflow: "auto", overscrollBehavior: "none" });
+      
+           }
+          }
+          onMouseLeave={(e) =>
+            (e.currentTarget.style.overflow = "hidden")
+          }
+          onTouchStart={handleTouchStart}
+      >
       <Header />
         {/* <div className="flex justify-center w-full"><SearchInputContainer/></div> */}
         <Suspense fallback={<div>Loading...</div>}>

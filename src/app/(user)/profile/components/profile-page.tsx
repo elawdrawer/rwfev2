@@ -3,6 +3,7 @@ import {
   fetchProfilePosts,
   fetchTaggedVideos,
   followUser,
+  postShareUrl,
   unFollowUser,
 } from "@/apis/profile";
 import { ScrollBar, ScrollArea } from "@/components/ui/scroll-area";
@@ -11,6 +12,9 @@ import { Separator } from "@/components/ui/separator";
 import {
   Bookmark,
   Grip,
+  Share,
+  Share2,
+  Share2Icon,
   Star,
   Tag,
   UserCheck,
@@ -42,7 +46,9 @@ import EditProfile from "./edit-profile";
 import { FollowingList } from "./following";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-// import EditProfilePicture from "./profilePicture";
+import { URL } from "url";
+import ShareLinkModal from "./shareModal";
+import EditProfilePicture from "./profilePicture";
 
 export async function generateMetadata(
   profileData: ProfileDataProps,
@@ -67,6 +73,8 @@ const ProfilePage = ({ profileData, id }: Props) => {
   const [followerCount, setFollowerCount] = useState<number>(0);
   const [myProfile, setMyProfile] = useState<boolean>(false);
   const [follower, setFollower] = useState<boolean>();
+  const [shareLink, setShareLink] = useState<string>("");
+  const [shareModal, setShareModal] = useState<boolean>(false);
   const [data, setData] = useState<{
     fname: string;
     lname: string;
@@ -76,10 +84,11 @@ const ProfilePage = ({ profileData, id }: Props) => {
     gender: string;
     email: string | undefined;
     phone: string | undefined;
+    profileImage: string;
     SocialUrls: {
       whatsapp: string;
       linkedin: string;
-      facebook: string;
+      // facebook: string;
       instagram: string;
       twitter: string;
     };
@@ -92,10 +101,11 @@ const ProfilePage = ({ profileData, id }: Props) => {
     gender: "",
     email: "",
     phone: "",
+    profileImage: "",
     SocialUrls: {
       whatsapp: "",
       linkedin: "",
-      facebook: "",
+      // facebook: "",
       instagram: "",
       twitter: "",
     },
@@ -128,6 +138,7 @@ const ProfilePage = ({ profileData, id }: Props) => {
           gender: profileData.indGender,
           email: profileData?.indEmail,
           phone: profileData?.indMobileNum,
+          profileImage: profileData?.indPic.original,
           SocialUrls: {
             whatsapp: profileData?.socialUrls.whatsapp,
             linkedin: profileData?.socialUrls.linkedin,
@@ -243,7 +254,7 @@ const ProfilePage = ({ profileData, id }: Props) => {
     phone: string | undefined,
     whatsapp: string,
     linkedin: string,
-    facebook: string,
+    // facebook: string,
     instagram: string,
     twitter: string,
   ) => {
@@ -261,10 +272,19 @@ const ProfilePage = ({ profileData, id }: Props) => {
         SocialUrls: {
           whatsapp: whatsapp,
           linkedin: linkedin,
-          facebook: facebook,
+          // facebook: facebook,
           instagram: instagram,
           twitter: twitter,
         },
+      }));
+    }
+  };
+
+  const imageReload = (profileImage: string) => {
+    if (profileData) {
+      setData((prev) => ({
+        ...prev,
+        profileImage: profileImage,
       }));
     }
   };
@@ -276,104 +296,55 @@ const ProfilePage = ({ profileData, id }: Props) => {
         if (scrollContainerRef.current) {
           scrollContainerRef.current.style.overflow = "hidden";
         }
-      }, 3000); // Adjust the delay in milliseconds (e.g., 3000ms = 3 seconds)
+      }, 10000); // Adjust the delay in milliseconds (e.g., 3000ms = 3 seconds)
     }
   };
+
+  const handleShareFunctionality = async () => {
+    const path = "/profile/" + profileData?.userName;
+    const urlShortner = await postShareUrl(path);
+    setShareLink(urlShortner?.data.shortUrl);
+  };
+
   return (
     profileData && (
-      <div className="min-h-screen p-4">
+      <div className=" p-4">
         {/* Profile Header Section */}
-        <div className="flex flex-col sm:flex-row items-start gap-4">
+        <div className="flex flex-col sm:flex-row items-start">
           {/* Profile Image */}
-          <div className="flex-shrink-0">
+
+          <div className="flex-shrink-0 relative">
             <Image
-              src={
-                profileData?.indPic?.original || "https://github.com/shadcn.png"
-              }
+              src={data.profileImage || "https://github.com/shadcn.png"}
               width={500}
               height={500}
               alt="Profile Image"
               className="w-180 h-auto sm:w-32 sm:h-32 md:w-40 md:h-40 object-cover rounded-lg"
             />
+            <div className="absolute -bottom-1 -right-1">
+              <EditProfilePicture
+                profileData={data}
+                imageReload={imageReload}
+              />
+            </div>
           </div>
 
           {/* Profile Details */}
-          <div className="flex flex-col flex-grow">
-            <div className="flex flex-col px-4">
-              <div className="flex gap-6 items-center">
-                <p className="font-bold text-lg sm:text-xl md:text-2xl">
-                  {data.fname} {data.lname}
-                </p>
-
-                <div className="flex gap-3">
-                  {!myProfile && (
-                    <Button
-                      variant={"default"}
-                      className="rounded-full w-8 h-8 font-bold"
-                      // size={"default"}
-                      onClick={async () => {
-                        if (follower) {
-                          // await  handlefollowUser();
-                          await handleUnfollowUser();
-                        } else {
-                          // await  handleUnfollowUser();
-                          await handlefollowUser();
-                        }
-                      }}
-                    >
-                      {follower ? (
-                        <UserRoundCheckIcon />
-                      ) : (
-                        <UserRoundPlusIcon />
-                      )}
-                    </Button>
-                  )}
-
-                  {myProfile && (
-                    <Dialog>
-                      <DialogTrigger asChild>
-                        <Button
-                          variant={"outline"}
-                          className="hover:bg-transparent font-bold hover:underline"
-                        >
-                          Edit profile
-                        </Button>
-                      </DialogTrigger>
-                      <EditProfile
-                        profileData={profileData}
-                        data={data}
-                        reload={reload}
-                      />
-                    </Dialog>
-                  )}
-                </div>
-              </div>
-
-              <div
-                style={{
-                  paddingBlock: "4px",
-                }}
-                className="flex items-center gap-4"
-              >
-                <small className="text-base font-semibold text-gray-500">
-                  {profileData?.userName || "Username"}
-                </small>
-              </div>
+          <div className="grid grid-cols-1 sm:flex-1 mt-4 sm:mt-0 ">
+            <div className="col-span-1 flex items-end align-baseline gap-2 px-4">
+              <p className="dark:text-white font-bold text-lg sm:text-xl md:text-2xl">
+                {data.fname} {data.lname}
+              </p>
             </div>
 
-            <div className="flex text-xs sm:text-base font-semibold text-gray-500">
-              {/* <Button
-                  variant={"ghost"}
-                  // size={"icon"}
-                  className="hover:bg-transparent disabled:text-black dark:disabled:text-white"
-                  disabled
-                >
-                  <div className="flex gap-1 text-xs sm:text-base">
-                    <span>{profileData?.totalPublishedPosts || 0} </span>
-                    <span >Reviews</span>
-                  </div>
-                </Button> */}
+            <div className="col-span-1 flex items-end align-baseline gap-2 px-4">
+              <small className="text-base font-semibold text-gray-500">
+                {profileData?.userName || "Username"}
+              </small>
+            </div>
 
+           
+            <div className="flex col-span-1 pb-1 text-xs sm:text-base font-semibold text-gray-500">
               <Dialog>
                 <DialogTrigger asChild>
                   <Button
@@ -421,42 +392,99 @@ const ProfilePage = ({ profileData, id }: Props) => {
               </Dialog>
             </div>
 
-            <div className="max-w-[650px] flex flex-col px-4 pb-6">
+            <div
+              style={{
+                paddingBlock: "4px",
+              }}
+              className="flex items-end gap-2 px-4 col-span-1"
+            >
+              <div className="flex items-center align-baseline">
+                {!myProfile && (
+                  <Button
+                    variant={"default"}
+                    className="font-bold"
+                    // size={"default"}
+                    onClick={async () => {
+                      if (follower) {
+                        // await  handlefollowUser();
+                        await handleUnfollowUser();
+                      } else {
+                        // await  handleUnfollowUser();
+                        await handlefollowUser();
+                      }
+                    }}
+                  >
+                    {follower ? (
+                      <>
+                        <UserRoundCheckIcon /> <small>Following</small>{" "}
+                      </>
+                    ) : (
+                      <>
+                        <UserRoundPlusIcon />
+                        <small>Follow</small>
+                      </>
+                    )}
+                  </Button>
+                )}
+
+                {myProfile && (
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <Button
+                        variant={"outline"}
+                        className="hover:bg-transparent font-bold hover:underline"
+                      >
+                        Edit
+                      </Button>
+                    </DialogTrigger>
+                    <EditProfile
+                      profileData={profileData}
+                      data={data}
+                      reload={reload}
+                    />
+                  </Dialog>
+                )}
+              </div>
+              <ShareLinkModal
+                shareLink={handleShareFunctionality}
+                link={shareLink}
+              />
+            </div>
+
+            <div className="max-w-[650px] col-span-1 flex flex-col px-4">
               <p className="text-sm font-normal sm:text-md md:text-base leading-tight">
                 {data?.title}
               </p>
               <p className="text-xs sm:text-sm md:text-md text-muted-foreground mb-2 truncate">
                 {data?.desc}
               </p>
+            </div>
 
-              {/* rating */}
-              <div className="flex items-center mt-1 gap-2">
-                {Array.from({ length: 5 }).map((_, index) => (
-                  <Star
-                    key={index}
-                    className={`w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 ${
-                    index < Math.round(profileData?.avgRating || 0)
-                        ? "text-orange-500"
-                        : "text-gray-500"
-                    }`}
-                  />
-                ))}
-                <span className="text-xs sm:text-sm md:text-base">
-                  <span className="text-green-500">
-                    {profileData?.avgRating}/5
-                  </span>{" "}
-                  on{" "}
-                  <span className="text-red-500">
-                    {profileData?.totalRating || 0}
-                  </span>{" "}
-                  Ratings
-                </span>
-              </div>
+            {/* rating */}
+            <div className="flex items-center mt-1 gap-2 px-4 pb-2">
+              {Array.from({ length: 5 }).map((_, index) => (
+                <Star
+                  key={index}
+                  className={`w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 ${
+                  index < Math.round(profileData?.avgRating || 0)
+                      ? "text-orange-500"
+                      : "text-gray-500"
+                  }`}
+                />
+              ))}
+              <span className="text-xs sm:text-sm md:text-base">
+                <span className="text-green-500">
+                  {profileData?.avgRating}/5
+                </span>{" "}
+                on{" "}
+                <span className="text-red-500">
+                  {profileData?.totalRating || 0}
+                </span>{" "}
+                Ratings
+              </span>
             </div>
           </div>
 
-          {/* <EditProfilePicture  profileData={profileData}/> */}
-          {/* Social Icons */}
           <SocialMedia profileData={data} />
         </div>
 
@@ -495,10 +523,10 @@ const ProfilePage = ({ profileData, id }: Props) => {
 
             {/* Posts Section */}
             <div className="py-6">
-              <div className="flex w-full justify-center">
+              <div className="flex w-full justify-center  ">
                 <div
                   className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-x-1 gap-y-1
-                    h-[700px]"
+                    h-[700px] "
                   ref={scrollContainerRef}
                   onScroll={handleScrollEvent}
                   onMouseEnter={(e) =>
@@ -516,7 +544,7 @@ const ProfilePage = ({ profileData, id }: Props) => {
                         key={index}
                         height={1000}
                         width={1000}
-                        className="min-w-[130px] max-w-[290px] s:min-w-[240px] sm:max-w-[290px] h-[250px]
+                        className="min-w-[130px] max-w-[300px] s:min-w-[260px] sm:max-w-[290px] h-[250px]
                           md:h-[350px] lg:h-[400px] xl:h-[450px]"
                         aspectRatio="portrait"
                       />
@@ -538,7 +566,7 @@ const ProfilePage = ({ profileData, id }: Props) => {
                   className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6
                     gap-x-1 gap-y-1 h-[700px]"
                   ref={scrollContainerRef}
-                  onScroll={handleScrollEvent}
+                  onScroll={handleScrollEventTagged}
                   onMouseEnter={(e) =>
                     (e.currentTarget.style.overflow = "auto")
                   }

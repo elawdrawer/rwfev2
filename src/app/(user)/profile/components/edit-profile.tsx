@@ -45,7 +45,7 @@ interface Props {
     SocialUrls: {
       whatsapp: string;
       linkedin: string;
-      facebook: string;
+      // facebook: string;
       instagram: string;
       twitter: string;
     };
@@ -62,7 +62,7 @@ interface Props {
     phone: string,
     whatsapp: string,
     linkedin: string,
-    facebook: string,
+    // facebook: string,
     instagram: string,
     twitter: string,
   ) => void;

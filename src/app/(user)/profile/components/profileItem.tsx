@@ -8,6 +8,9 @@ import AllVideoCardItem from "../../search/components/search-allReviews-item";
 import { ScrollBar } from "@/components/ui/scroll-area";
 import { VideoData } from "./dataTypes";
 import { cn } from "@/lib/utils";
+import { Trash2Icon } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import DeleteModal from "./deleteModal";
 
 export interface videoProps extends React.HTMLAttributes<HTMLDivElement> {
   data: VideoData;
@@ -25,10 +28,11 @@ export default function ProfileItem({
   ...props
 }: videoProps) {
   const router = useRouter();
+  console.log("data:::", data);
   return (
-    <div className={cn(" relative h-full w-full p-1", className)} {...props}>
+    <div className={cn(" relative h-full w-full p-0.5", className)} {...props}>
       <div
-        className="overflow-hidden relative cursor-pointer h-full rounded-md"
+        className="overflow-hidden relative cursor-pointer h-full rounded-sm"
         onClick={() => router.push("/watch?v=" + data.videoId)}
       >
         <Image
@@ -36,9 +40,15 @@ export default function ProfileItem({
           alt={data.title}
           width={width}
           height={height}
-          className={`w-auto h-full object-cover transition-all hover:scale-105`}
+          className={
+            "w-full h-full object-cover transition-all hover:scale-105"
+          }
         />
-            <div className="absolute inset-0 bg-gradient-to-b from-black/0 via-black/0 to-black/90" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/0 via-black/0 to-black/90" />
+
+        <div className="absolute right-1 top-1">
+          <DeleteModal />
+        </div>
 
         <div className="flex-1 w-full absolute bottom-0 p-3">
           <p

@@ -12,25 +12,25 @@ interface Props {
     gender: string;
     email: string | undefined;
     phone: string | undefined;
-    SocialUrls :{
+    SocialUrls: {
       whatsapp: string;
       linkedin: string;
-      facebook: string;
+      // facebook: string;
       instagram: string;
       twitter: string;
-    }
+    };
   };
 }
 
 export default function SocialMedia({ profileData }: Props) {
-  console.log("checking profileData", profileData.SocialUrls?.whatsapp.length);
+  console.log("checking profileData", profileData.SocialUrls);
 
   return (
-    <div className="social-icons flex sm:flex-col ms-4 mt-1 items-center justify-center sm:mt-0">
+    <div className=" flex sm:flex-col px-4 sm:ms-4 sm:mt-1 items-center justify-center">
       {profileData.SocialUrls?.whatsapp.length !== 0 && (
         <Link href={profileData.SocialUrls?.whatsapp.trim()}>
           <Image
-            className="mb-2 mr-5"
+            className="mb-2 mr-5 w-8 h-8 sm:w-12 sm:h-12"
             src="/whatsApp-logo.png"
             alt="social-icon"
             height={50}
@@ -42,7 +42,7 @@ export default function SocialMedia({ profileData }: Props) {
       {profileData.SocialUrls?.twitter.length !== 0 && (
         <Link href={profileData.SocialUrls?.twitter}>
           <Image
-            className="mb-2 mr-5"
+            className="mb-2 mr-5 w-8 h-8 sm:w-12 sm:h-12"
             src="/twitter-old-logo.png"
             alt="social-icon"
             height={50}
@@ -55,7 +55,7 @@ export default function SocialMedia({ profileData }: Props) {
         <Link href={profileData.SocialUrls?.instagram}>
           {" "}
           <Image
-            className="mb-2 mr-5"
+            className="mb-2 mr-5 w-8 h-8 sm:w-12 sm:h-12"
             src="/Instagram-logo.png"
             alt="social-icon"
             height={50}
@@ -68,7 +68,7 @@ export default function SocialMedia({ profileData }: Props) {
         <Link href={profileData.SocialUrls?.linkedin}>
           {" "}
           <Image
-            className="mb-2 mr-5"
+            className="mb-2 mr-5 w-8 h-8 sm:w-12 sm:h-12"
             src="/Linkedin-logo.png"
             alt="social-icon"
             height={50}
