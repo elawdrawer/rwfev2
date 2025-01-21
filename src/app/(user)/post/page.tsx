@@ -20,7 +20,7 @@ export default function HomePage() {
         <Header />
         <Suspense fallback={<div>Loading...</div>}>
           <main
-            className="min-h-screen bg-gradient-to-b from-background to-secondary p-8 h-full
+            className="min-h-screen bg-gradient-to-b from-background to-secondary  h-full
               overflow-scroll scrollbar-hide"
           >
             <div className="max-w-7xl mx-auto">

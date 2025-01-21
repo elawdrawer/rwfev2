@@ -69,14 +69,14 @@ export function LocationInput({ value, onChange }: LocationInputProps) {
           </div>
         )}
       </div>
-      {apiError && (
+      {/* {apiError && (
         <Alert variant="destructive">
           <AlertCircle className="h-4 w-4" />
           <AlertDescription>
             Location services are currently unavailable. Please enter your location manually.
           </AlertDescription>
         </Alert>
-      )}
+      )} */}
     </div>
   );
 }

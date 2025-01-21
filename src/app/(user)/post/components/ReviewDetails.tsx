@@ -13,7 +13,13 @@ import { Textarea } from "@/components/ui/textarea";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { reviewFormSchema, type ReviewFormData } from "../validation/review";
-import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormMessage,
+} from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 
 interface ReviewDetailsProps {
@@ -55,7 +61,17 @@ export function ReviewDetails({
     mode: "onChange",
   });
 
-  const { formState: { isValid, errors } } = form;
+  const {
+    formState: { isValid, errors },
+  } = form;
+
+  console.log(
+    "checking data in review details",
+    title,
+    category,
+    description,
+    location,
+  );
 
   const handleThumbnailUpload = (file: File) => {
     const reader = new FileReader();
@@ -106,11 +122,11 @@ export function ReviewDetails({
           render={({ field }) => (
             <FormItem>
               <Label>Category</Label>
-              <Select 
+              <Select
                 onValueChange={(value) => {
                   field.onChange(value);
                   form.trigger("category");
-                }} 
+                }}
                 defaultValue={field.value}
               >
                 <FormControl>
@@ -158,7 +174,8 @@ export function ReviewDetails({
             <FormItem>
               <Label>Cover Photo</Label>
               <div
-                className="border-2 border-dashed rounded-lg p-4 hover:bg-secondary/50 transition-colors cursor-pointer"
+                className="border-2 border-dashed rounded-lg p-4 hover:bg-secondary/50 transition-colors
+                  cursor-pointer"
                 onClick={() => {
                   const input = document.createElement("input");
                   input.type = "file";
@@ -197,23 +214,23 @@ export function ReviewDetails({
           name="location"
           render={({ field }) => (
             <FormItem>
-              <LocationInput 
-                value={field.value} 
+              <LocationInput
+                value={field.value}
                 onChange={(value) => {
                   field.onChange(value);
                   form.trigger("location");
-                }} 
+                }}
               />
               <FormMessage />
             </FormItem>
           )}
         />
-
-        <div className="flex justify-end gap-4">
-          <Button type="submit" disabled={!isValid}>
-            Next
-          </Button>
-        </div>
+        {/* 
+        // <div className="flex justify-end gap-4">
+        //   <Button type="submit" disabled={!isValid}>
+        //     Next
+        //   </Button>
+        // </div> */}
       </form>
     </Form>
   );

@@ -150,27 +150,33 @@ export function ReviewForm() {
       case 1:
         return (
           <div className="space-y-4">
-            {/* this div has to render only if video not uploaded and if it's desktop view */}
-            {(!isMobile || (!videoUrl && isMobile)) && (
-              <div>
-                <h2 className="text-2xl font-semibold">
-                  Share Your Video Review
-                </h2>
-                <VideoUploader
-                  hasExistingVideo={!!videoUrl}
-                  onUploadComplete={(url, file) => {
-                    setVideoUrl(url);
-                    setVideoFile(file);
-                    toast.success(
-                      "Video uploaded successfully! Click Next to continue.",
-                    );
-                  }}
-                />
-              </div>
-            )}
+            {/* Show video preview and change functionality for mobile */}
+            <div>
+              <h2 className="text-2xl font-semibold">
+                Share Your Video Review
+              </h2>
+              <VideoUploader
+                hasExistingVideo={!!videoUrl}
+                onUploadComplete={(url, file) => {
+                  setVideoUrl(url);
+                  setVideoFile(file);
+                  toast.success(
+                    "Video uploaded successfully! Click Next to continue.",
+                  );
+                }}
+              />
+            </div>
+            {/* Navigation Buttons */}
             <div className="flex justify-end gap-4 mb-4">
-              {videoUrl && (
-                <Button onClick={() => setStep(2)}>Change Video</Button>
+              {isMobile && videoUrl && (
+                <Button
+                  onClick={() => {
+                    setVideoUrl("");
+                    setVideoFile(null);
+                  }}
+                >
+                  Change Video
+                </Button>
               )}
               <Button disabled={!videoUrl} onClick={() => setStep(2)}>
                 Next
@@ -187,6 +193,7 @@ export function ReviewForm() {
                 overflowY: "scroll",
                 padding: "12px",
                 // overflowY:'hidden'
+                minHeight: `${isMobile && "100vh"}`,
               }}
               className="space-y-6 scrollbar-hide"
             >
@@ -208,14 +215,12 @@ export function ReviewForm() {
                 onNext={() => setStep(3)}
                 // setStep={setStep}
               />
-              {/* <div className="flex justify-end gap-4">
+              <div className="flex justify-end gap-4">
                 <Button variant="outline" onClick={() => setStep(1)}>
                   Back
                 </Button>
-                <Button onClick={() => setStep(3)} disabled={!isStepTwoValid}>
-                  Next
-                </Button>
-              </div> */}
+                <Button onClick={() => setStep(3)}>Next</Button>
+              </div>
             </div>
           </div>
         );
