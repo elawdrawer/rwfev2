@@ -150,27 +150,32 @@ export function ReviewForm() {
       case 1:
         return (
           <div className="space-y-4">
-            <h2 className="text-2xl font-semibold">Share Your Video Review</h2>
-            <VideoUploader
-              hasExistingVideo={!!videoUrl}
-              onUploadComplete={(url, file) => {
-                setVideoUrl(url);
-                setVideoFile(file);
-                toast.success(
-                  "Video uploaded successfully! Click Next to continue.",
-                );
-              }}
-            />
-            {videoUrl && (
-              <>
-                <div className="md:hidden">
-                  {/* <VideoPreview videoUrl={videoUrl} /> */}
-                </div>
-                <div className="flex justify-end">
-                  <Button onClick={() => setStep(2)}>Next</Button>
-                </div>
-              </>
+            {/* this div has to render only if video not uploaded and if it's desktop view */}
+            {(!isMobile || (!videoUrl && isMobile)) && (
+              <div>
+                <h2 className="text-2xl font-semibold">
+                  Share Your Video Review
+                </h2>
+                <VideoUploader
+                  hasExistingVideo={!!videoUrl}
+                  onUploadComplete={(url, file) => {
+                    setVideoUrl(url);
+                    setVideoFile(file);
+                    toast.success(
+                      "Video uploaded successfully! Click Next to continue.",
+                    );
+                  }}
+                />
+              </div>
             )}
+            <div className="flex justify-end gap-4 mb-4">
+              {videoUrl && (
+                <Button onClick={() => setStep(2)}>Change Video</Button>
+              )}
+              <Button disabled={!videoUrl} onClick={() => setStep(2)}>
+                Next
+              </Button>
+            </div>
           </div>
         );
       case 2:
