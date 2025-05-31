@@ -45,7 +45,7 @@ const BusinessHeader: React.FC<BusinessHeaderProps> = ({ business }) => {
   const [selectedBannerFile, setSelectedBannerFile] = useState<File | null>(
     null,
   );
-
+  const [zoomedImage, setZoomedImage] = useState<string | null>(null);
   const isMobile = useIsMobile();
 
   const isOwner = useIsOwner(business.businessPageOwner);
@@ -57,7 +57,11 @@ const BusinessHeader: React.FC<BusinessHeaderProps> = ({ business }) => {
     setSelectedFile(file || null);
   };
   const handleLogoClick = () => {
-    setIsModalOpen(true);
+    if (isOwner) {
+      setIsModalOpen(true);
+    } else {
+      setZoomedImage(business.defaultBusinessImage.original);
+    }
   };
 
   const handleShare = async () => {
@@ -248,6 +252,23 @@ const BusinessHeader: React.FC<BusinessHeaderProps> = ({ business }) => {
           </div>
         )}
       </div>
+
+      {zoomedImage && (
+        <Dialog
+          open={!!zoomedImage}
+          onOpenChange={(open) => {
+            if (!open) setZoomedImage(null);
+          }}
+        >
+          <DialogContent className="max-w-[45vw] max-h-[45vh] p-0 overflow-hidden">
+            <img
+              src={zoomedImage}
+              alt={`Zoomed ${business.businessName} logo`}
+              className="w-full h-full object-contain"
+            />
+          </DialogContent>
+        </Dialog>
+      )}
 
       {/* Business business */}
       <div className="relative max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 -mt-36 z-10">

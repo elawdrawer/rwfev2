@@ -33,13 +33,17 @@ const PushNotifications = () => {
             console.warn("[3.1] Permission not granted");
             return;
           }
-
-          const subscription = await registration.pushManager.subscribe({
-            userVisibleOnly: true,
-            applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY),
-          });
-
-          console.log("[4] Push subscription:", subscription);
+          let subscription;
+          try {
+            subscription = await registration.pushManager.subscribe({
+              userVisibleOnly: true,
+              applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY),
+            });
+            console.log("[4] Push subscription:", subscription);
+          } catch (subErr) {
+            console.error("[❌] Subscription failed:", subErr);
+            return;
+          }
 
           const payload = {
             indPushNotify: true,

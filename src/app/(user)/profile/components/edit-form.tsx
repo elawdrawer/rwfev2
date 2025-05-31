@@ -3,15 +3,16 @@ import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { EditPersonalInfoFormSchema, PersonalInfoFormSchema } from "@/schema";
+import { EditPersonalInfoFormSchema } from "@/schema";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useState, useTransition } from "react";
+import React, { useEffect, useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { ProfileDataProps } from "./dataTypes";
@@ -21,13 +22,16 @@ import FormSuccess from "./form-success";
 import { useRouter } from "next/navigation";
 import { DialogFooter } from "@/components/ui/dialog";
 import { DialogClose } from "@radix-ui/react-dialog";
-import { FaWhatsapp } from "react-icons/fa";
-import { BsWhatsapp } from "react-icons/bs";
-import { MdFacebook, MdWhatsapp } from "react-icons/md";
+import { MdWhatsapp } from "react-icons/md";
 import { Badge } from "@/components/ui/badge";
-import { IoLogoInstagram, IoLogoTwitter } from "react-icons/io5";
-import { LinkedInLogoIcon, TwitterLogoIcon } from "@radix-ui/react-icons";
+import { IoLogoInstagram } from "react-icons/io5";
+import { LinkedInLogoIcon } from "@radix-ui/react-icons";
 import { FaXTwitter } from "react-icons/fa6";
+import { Textarea } from "@/components/ui/textarea";
+import { fetchHomeCategories } from "@/apis/home";
+import { Skeleton } from "@/components/ui/skeleton";
+import { toast } from "sonner";
+
 interface Props {
   data: {
     fname: string;
@@ -38,13 +42,10 @@ interface Props {
     gender: string;
     email: string | undefined;
     phone: string | undefined;
-    // SocialUrls: {
-    //   whatsapp: string;
-    //   linkedin: string;
-    //   // facebook: string;
-    //   instagram: string;
-    //   twitter: string;
-    // };
+    userName: string;
+    location: string;
+    interest?: string;
+    categoryPref: string[];
   };
   profileData: ProfileDataProps;
   reload: (
@@ -58,11 +59,26 @@ interface Props {
     phone: string,
     whatsapp: string,
     linkedin: string,
-
     instagram: string,
     twitter: string,
+    userName: string,
+    location: string,
+    interest: string,
+    categoryPref: string[],
   ) => void;
 }
+
+const categoryOptions = [
+  { value: "technology", label: "Technology" },
+  { value: "business", label: "Business" },
+  { value: "health", label: "Health" },
+  { value: "education", label: "Education" },
+  { value: "entertainment", label: "Entertainment" },
+  { value: "art", label: "Art" },
+  { value: "science", label: "Science" },
+  { value: "sports", label: "Sports" },
+];
+
 export default function EditForm({ data, reload, profileData }: Props) {
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | undefined>();
@@ -71,20 +87,52 @@ export default function EditForm({ data, reload, profileData }: Props) {
     resolver: zodResolver(EditPersonalInfoFormSchema),
     mode: "onChange",
     defaultValues: {
-      email: data.email,
-      lastname: data.lname,
-      firstname: data.fname,
-      mobile: data.phone,
-      dob: new Date(data.dob) ?? new Date(),
-      gender: data.gender,
-      title: data.title,
-      desc: data.desc,
-      // watsapp: data?.SocialUrls?.whatsapp,
-      // instagram: data.SocialUrls?.instagram,
-      // twitter: data.SocialUrls?.twitter,
-      // linkdin: data.SocialUrls?.linkedin,
+      email: data.email || "",
+      lastname: data.lname || "",
+      firstname: data.fname || "",
+      mobile: data.phone || "",
+      dob: data.dob ? new Date(data.dob) : new Date(),
+      gender: data.gender || "",
+      title: data.title || "",
+      desc: data.desc || "",
+      userName: data.userName || "",
+      location: data.location || "",
+      interest: data.interest || "",
+      categoryPref: data.categoryPref || [],
     },
   });
+
+  const closeRef = React.useRef<HTMLButtonElement>(null);
+
+  const [categoryOptions, setCategoryOptions] = useState<
+    {
+      value: string;
+      label: string;
+    }[]
+  >([]);
+  const [loadingCategories, setLoadingCategories] = useState(true);
+
+  useEffect(() => {
+    const loadCategories = async () => {
+      try {
+        const response = await fetchHomeCategories();
+        if (response.data) {
+          setCategoryOptions(
+            response.data.map((item: any) => ({
+              value: item._id, // Using _id as the value
+              label: item.name,
+            })),
+          );
+        }
+      } catch (error) {
+        console.error("Failed to load categories:", error);
+      } finally {
+        setLoadingCategories(false);
+      }
+    };
+
+    loadCategories();
+  }, []);
 
   const onSubmit = (values: z.infer<typeof EditPersonalInfoFormSchema>) => {
     setError("");
@@ -93,12 +141,11 @@ export default function EditForm({ data, reload, profileData }: Props) {
       EditPersonalInfo(values)
         .then((res) => {
           if (res?.error) {
-            // form.reset();
             setError(res?.error);
           }
 
           if (res?.success) {
-            // form.reset();
+            toast.success("Profile updated successfully.");
             setSuccess(res?.success);
             reload(
               values.firstname,
@@ -113,14 +160,22 @@ export default function EditForm({ data, reload, profileData }: Props) {
               values.linkdin || "",
               values.instagram || "",
               values.twitter || "",
+              values.userName,
+              values.location,
+              values.interest || "",
+              values.categoryPref,
             );
-          }
 
-          //start transition will tell when the validation has ended till then the feilds will be disabled
+            setTimeout(() => {
+              closeRef.current?.click();
+            }, 500);
+          }
         })
         .catch((error: any) => setError(error.message));
     });
   };
+
+  console.log("Form data received:", data);
 
   return (
     <Form {...form}>
@@ -129,9 +184,6 @@ export default function EditForm({ data, reload, profileData }: Props) {
           <div className="border border-gray-600 p-4 rounded-lg">
             <div className="mb-6">
               <div className="space-y-2">
-                {/* <Label htmlFor="title">Title</Label>
-                <Textarea id="title" placeholder="Title..." /> */}
-
                 <FormField
                   control={form.control}
                   name="title"
@@ -145,7 +197,6 @@ export default function EditForm({ data, reload, profileData }: Props) {
                           type="text"
                           maxLength={50}
                           minLength={3}
-                          // value={data.title}
                           disabled={pending}
                           onBlur={(e) => {
                             const value = e.target.value;
@@ -165,10 +216,6 @@ export default function EditForm({ data, reload, profileData }: Props) {
 
             <div className="mb-6">
               <div className="space-y-2">
-                {/* <Label htmlFor="description">Description</Label>
-                <Textarea id="description" placeholder="Description..." />
-                */}
-
                 <FormField
                   control={form.control}
                   name="desc"
@@ -180,7 +227,6 @@ export default function EditForm({ data, reload, profileData }: Props) {
                           {...field}
                           placeholder="description..."
                           type="text"
-                          // value={data.desc}
                           maxLength={500}
                           minLength={20}
                           disabled={pending}
@@ -200,6 +246,128 @@ export default function EditForm({ data, reload, profileData }: Props) {
             </div>
           </div>
 
+          {/* New Fields Section */}
+          <div className="border border-gray-600 p-4 rounded-lg">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+              <FormField
+                control={form.control}
+                name="userName"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Username</FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        placeholder="username"
+                        type="text"
+                        disabled={pending}
+                        onBlur={(e) => {
+                          const value = e.target.value;
+                          field.onChange(value.toLowerCase());
+                        }}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="location"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Location</FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        placeholder="Your location"
+                        type="text"
+                        disabled={pending}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            <FormField
+              control={form.control}
+              name="interest"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Interests</FormLabel>
+                  <FormControl>
+                    <Textarea
+                      {...field}
+                      placeholder="Your interests (separated by commas)"
+                      disabled={pending}
+                      rows={3}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="categoryPref"
+              render={({ field }) => {
+                const currentValues = field.value || [];
+
+                return (
+                  <FormItem className="mt-4">
+                    <FormLabel>Category Preferences</FormLabel>
+                    {loadingCategories ? (
+                      <div className="flex flex-wrap gap-2">
+                        {[...Array(5)].map((_, i) => (
+                          <Skeleton key={i} className="h-9 w-24 rounded-full" />
+                        ))}
+                      </div>
+                    ) : (
+                      <>
+                        <FormControl>
+                          <div className="flex flex-wrap gap-2">
+                            {categoryOptions.map((option) => (
+                              <Button
+                                key={option.value}
+                                type="button"
+                                variant={
+                                  currentValues.includes(option.value)
+                                    ? "default"
+                                    : "outline"
+                                }
+                                onClick={() => {
+                                  const newValue = currentValues.includes(
+                                    option.value,
+                                  )
+                                    ? currentValues.filter(
+                                        (v) => v !== option.value,
+                                      )
+                                    : [...currentValues, option.value];
+                                  field.onChange(newValue);
+                                }}
+                                className="rounded-full px-4 py-2 text-sm"
+                              >
+                                {option.label}
+                              </Button>
+                            ))}
+                          </div>
+                        </FormControl>
+                        {/* <FormDescription>
+                          Selected IDs: {currentValues.join(", ")}
+                        </FormDescription> */}
+                      </>
+                    )}
+                    <FormMessage />
+                  </FormItem>
+                );
+              }}
+            />
+          </div>
+
+          {/* Social Media Section */}
           <div
             className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6 mt-6 border border-gray-600 p-4
               rounded-lg"
@@ -222,7 +390,6 @@ export default function EditForm({ data, reload, profileData }: Props) {
                         type="text"
                         className="rounded-l-none rounded-r-md"
                         disabled={pending}
-                        // value={data.indFirstName}
                       />
                     </FormControl>
                     <FormMessage className="col-span-9" />
@@ -249,7 +416,6 @@ export default function EditForm({ data, reload, profileData }: Props) {
                         type="text"
                         disabled={pending}
                         className="rounded-l-none rounded-r-md"
-                        // value={data.indFirstName}
                       />
                     </FormControl>
                     <FormMessage className="col-span-9" />
@@ -275,7 +441,6 @@ export default function EditForm({ data, reload, profileData }: Props) {
                         type="text"
                         className="rounded-l-none rounded-r-md"
                         disabled={pending}
-                        // value={data.indFirstName}
                       />
                     </FormControl>
                     <FormMessage className="col-span-9" />
@@ -301,7 +466,6 @@ export default function EditForm({ data, reload, profileData }: Props) {
                         type="text"
                         className="rounded-l-none rounded-r-md"
                         disabled={pending}
-                        // value={data.indFirstName}
                       />
                     </FormControl>
                     <FormMessage className="col-span-9" />
@@ -311,6 +475,7 @@ export default function EditForm({ data, reload, profileData }: Props) {
             </div>
           </div>
 
+          {/* Personal Info Section */}
           <div
             className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6 mt-6 border border-gray-600 p-4
               rounded-lg"
@@ -330,7 +495,6 @@ export default function EditForm({ data, reload, profileData }: Props) {
                         maxLength={30}
                         minLength={3}
                         disabled={pending}
-                        // value={data.indFirstName}
                         onBlur={(e) => {
                           const value = e.target.value;
                           const capitalizedValue =
@@ -346,7 +510,6 @@ export default function EditForm({ data, reload, profileData }: Props) {
             </div>
 
             <div className="space-y-1">
-              {" "}
               <FormField
                 control={form.control}
                 name="lastname"
@@ -361,7 +524,6 @@ export default function EditForm({ data, reload, profileData }: Props) {
                         maxLength={30}
                         minLength={3}
                         disabled={pending}
-                        // value={data.indLastName}
                         onBlur={(e) => {
                           const value = e.target.value;
                           const capitalizedValue =
@@ -387,13 +549,10 @@ export default function EditForm({ data, reload, profileData }: Props) {
                         {...field}
                         placeholder="name@domain.com"
                         type="email"
-                        // value={data.indEmail}
                         disabled
                         onBlur={(e) => {
                           const value = e.target.value;
-
                           const lowerCase = value.toLocaleLowerCase();
-
                           field.onChange(lowerCase);
                         }}
                       />
@@ -416,10 +575,9 @@ export default function EditForm({ data, reload, profileData }: Props) {
                         placeholder="1234567890"
                         type="text"
                         maxLength={10}
-                        // value={data.indMobileNum}
                         disabled
                         onChange={(e) => {
-                          const value = e.target.value.replace(/\D/g, ""); // Remove non-numeric characters
+                          const value = e.target.value.replace(/\D/g, "");
                           if (value.length <= 10) {
                             field.onChange(value);
                           }
@@ -438,17 +596,10 @@ export default function EditForm({ data, reload, profileData }: Props) {
                 name="gender"
                 render={({ field }) => (
                   <FormItem className="w-full">
-                    <FormLabel>gender</FormLabel>
+                    <FormLabel>Gender</FormLabel>
                     <FormControl>
-                      {/* <Input
-                          {...field}
-                          placeholder="********"
-                          type="text"
-                          disabled={pending}
-                          /> */}
                       <SelectGender
                         {...field}
-                        // value={data.indGender}
                         error={form.formState.errors.mobile?.message}
                       />
                     </FormControl>
@@ -471,14 +622,14 @@ export default function EditForm({ data, reload, profileData }: Props) {
                         disabled={pending}
                         value={
                           field.value instanceof Date &&
-                          !isNaN(field.value.getTime()) // Ensure valid Date
+                          !isNaN(field.value.getTime())
                             ? field.value.toISOString().split("T")[0]
                             : ""
                         }
                         onChange={(e) => {
                           const dateValue = e.target.value
                             ? new Date(e.target.value)
-                            : null; // Use null for better form handling
+                            : null;
                           field.onChange(dateValue);
                         }}
                       />
@@ -494,7 +645,7 @@ export default function EditForm({ data, reload, profileData }: Props) {
         {success && <FormSuccess message={success} />}
         <div className="flex flex-row justify-center gap-12 w-full">
           <DialogFooter className="w-full">
-            <DialogClose />
+            <DialogClose ref={closeRef} className="hidden" />
             <Button className="w-full" type="submit">
               Save
             </Button>

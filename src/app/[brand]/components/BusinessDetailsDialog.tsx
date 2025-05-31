@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 import { formatHours } from "@/lib/utils";
@@ -13,8 +13,10 @@ interface BusinessDetailsDialogProps {
 const BusinessDetailsDialog: React.FC<BusinessDetailsDialogProps> = ({
   business,
 }) => {
+
   return (
     <div className="h-[90vh] md:h-[80vh] w-full flex flex-col">
+  
       <div className="bg-gray-800 p-4">
         <h2 className="text-xl md:text-2xl font-bold">
           {business.businessName}
@@ -45,7 +47,7 @@ const BusinessDetailsDialog: React.FC<BusinessDetailsDialogProps> = ({
             <div className="space-y-6">
               <div>
                 <h3 className="text-lg md:text-xl font-semibold mb-3">About</h3>
-                <p className="text-gray-700">{business.desc}</p>
+                <p>{business.desc}</p>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
@@ -57,12 +59,7 @@ const BusinessDetailsDialog: React.FC<BusinessDetailsDialogProps> = ({
                     <h4 className="font-medium text-gray-900 mb-2">{key}</h4>
                     <div>
                       {values.map((value, index) => (
-                        <p
-                          key={index}
-                          className="text-gray-700 dark:text-gray-300"
-                        >
-                          {value}
-                        </p>
+                        <p key={index}>{value}</p>
                       ))}
                     </div>
                   </div>
@@ -78,8 +75,7 @@ const BusinessDetailsDialog: React.FC<BusinessDetailsDialogProps> = ({
                     {business.keywords.map((keyword, index) => (
                       <span
                         key={index}
-                        className="px-3 py-1 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300
-                          rounded-full text-sm"
+                        className="px-3 py-1 bg-gray-200 dark:bg-gray-700 rounded-full text-sm"
                       >
                         {keyword}
                       </span>

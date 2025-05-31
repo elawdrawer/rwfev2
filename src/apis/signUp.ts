@@ -37,8 +37,9 @@ export const checkUserNameAvailability = async (
   } catch (error: any) {
     console.log("error\n\t", error);
     console.error("error", error.response);
-    return {status:false,message:error.response.data.message}  }
-}
+    return { status: false, message: error.response.data.message };
+  }
+};
 
 export async function validateEmail(
   email: string,
@@ -196,6 +197,7 @@ export async function signup(
   },
   latitude: string,
   longitude: string,
+  location: string,
 ) {
   try {
     console.log("Signup\n", value);
@@ -212,7 +214,7 @@ export async function signup(
         },
         indEmail: value.email,
         indPwd: value.password,
-        location:"karnataka",
+        location: location,
         indCountryCode: "91",
         indMobileNum: value.mobile,
         // indDob: "",
@@ -242,9 +244,9 @@ export async function signup(
       },
     );
     if (response.status === 200) {
-      return {status:true,message:"successfully created"} 
+      return { status: true, message: "successfully created" };
     } else {
-      return {status:false,message:response.data.message}; 
+      return { status: false, message: response.data.message };
     }
   } catch (error: any) {
     console.log("error\n\t", error);
@@ -252,8 +254,13 @@ export async function signup(
   }
 }
 
-export async function resendOTPEmail( email: string,  fingerPrints:string,latitude:string,longitude:string) {
-  console.log("resendOTPEmail\n",email,fingerPrints,latitude,longitude);
+export async function resendOTPEmail(
+  email: string,
+  fingerPrints: string,
+  latitude: string,
+  longitude: string,
+) {
+  console.log("resendOTPEmail\n", email, fingerPrints, latitude, longitude);
   try {
     console.log(
       `${process.env.NEXT_PUBLIC_API_BASE_URL}api/resendOTP?emailId=${email}`,

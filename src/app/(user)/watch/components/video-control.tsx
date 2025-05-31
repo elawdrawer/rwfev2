@@ -95,8 +95,6 @@ export function VideoControls({ video }: VideoControlsProps) {
     if (token) token.length > 0 ? setIsLoggedIn(true) : setIsLoggedIn(false);
   };
 
-  console.log("videoDetails", video);
-
   useEffect(() => {
     checkToken();
   }, []);
@@ -316,10 +314,8 @@ export function VideoControls({ video }: VideoControlsProps) {
             size="icon"
             className="text-white"
             onClick={navigateBack}
-         
           >
-            <ArrowLeft size={80} 
-            />
+            <ArrowLeft size={80} />
           </Button>
         </div>
       )}

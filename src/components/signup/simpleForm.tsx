@@ -1,5 +1,5 @@
 "use client";
-import { useForm, UseFormReturn } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { REGEXP_ONLY_DIGITS_AND_CHARS } from "input-otp";
 import { useRouter, useSearchParams } from "next/navigation";
 import * as z from "zod";
@@ -18,15 +18,11 @@ import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import FormError from "./form-error";
 import FormSuccess from "./form-success";
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import Link from "next/link";
-import { PersonalInfo, simpleForm } from "../../actions/signup";
-import { json } from "node:stream/consumers";
-import { SelectGender } from "./Gender-dropDown";
-import { Checkbox } from "@radix-ui/react-checkbox";
-import { LocationInput } from "./locationFiled";
+import { simpleForm } from "../../actions/signup";
 import { getDeviceFingerprint } from "@/lib/fingerPrint";
-import { cn } from "@/lib/utils";
+import { cn, getStoredLocation } from "@/lib/utils";
 import { EyeOpenIcon } from "@radix-ui/react-icons";
 import {
   InputOTP,
@@ -54,6 +50,7 @@ import {
 } from "@/apis/signUp";
 import { FcCancel } from "react-icons/fc";
 import { IoClose } from "react-icons/io5";
+import { useLocation } from "@/hooks/use-location";
 
 export default function SimpleForm() {
   const [pending, startTransition] = useTransition();
@@ -74,14 +71,9 @@ export default function SimpleForm() {
       : "";
 
   const fingerPrints = getDeviceFingerprint();
-  const isLocalStorageAvailable = localStorage;
-  // Safely access location data from localStorage
-  const latitude = isLocalStorageAvailable
-    ? (localStorage.getItem("loc-lat") ?? "90")
-    : "90";
-  const longitude = isLocalStorageAvailable
-    ? (localStorage.getItem("loc-lng") ?? "90")
-    : "90";
+  const [latitude, longitude] = getStoredLocation();
+  const { location } = useLocation();
+  const cleanedLocation = location.replace(/^[A-Z0-9]+\+\d+\s*/, "");
 
   const form = useForm<z.infer<typeof newSignupRwSchema>>({
     resolver: zodResolver(newSignupRwSchema),
@@ -97,6 +89,19 @@ export default function SimpleForm() {
       TnC2: false,
     },
   });
+
+  const userName = useWatch({
+    control: form.control,
+    name: "userName",
+  });
+
+  useEffect(() => {
+    if (userName && userName.length >= 3) {
+      checkUserNameAvailability(userName, latitude, longitude)
+        .then(() => setMessage(""))
+        .catch((err) => setMessage(err.message));
+    }
+  }, [userName]);
 
   const onSubmit = (values: z.infer<typeof newSignupRwSchema>) => {
     setError("");
@@ -150,7 +155,7 @@ export default function SimpleForm() {
     );
 
     if (validateOtp.status && validateOtpMobile.status) {
-      const register = await signup(val, latitude, longitude);
+      const register = await signup(val, latitude, longitude, cleanedLocation);
       if (register.status) {
         setError_1("");
         setSuccess_1(register.message);
@@ -252,9 +257,7 @@ export default function SimpleForm() {
                       disabled={pending}
                       onBlur={(e) => {
                         const value = e.target.value;
-
                         const lowerCase = value.toLocaleLowerCase();
-
                         field.onChange(lowerCase);
                       }}
                     />
@@ -309,20 +312,6 @@ export default function SimpleForm() {
                       disabled={pending}
                       minLength={3}
                       maxLength={30}
-                      onChange={async (e) => {
-                        field.onChange(e.target.value);
-                        await checkUserNameAvailability(
-                          e.target.value,
-                          latitude,
-                          longitude,
-                        )
-                          .then((res) => {
-                            //  setMessage(res?.message)
-                          })
-                          .catch((err) => {
-                            setMessage(err.message);
-                          });
-                      }}
                     />
                   </FormControl>
                   <FormMessage>{message}</FormMessage>

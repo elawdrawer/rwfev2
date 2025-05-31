@@ -22,13 +22,10 @@ interface Props {
     gender: string;
     email: string | undefined;
     phone: string | undefined;
-    // SocialUrls: {
-    //   whatsapp: string;
-    //   linkedin: string;
-    //   // facebook: string;
-    //   instagram: string;
-    //   twitter: string;
-    // };
+    userName: string; 
+    location: string; 
+    interest: string;
+    categoryPref: string[]; 
   };
   profileData: ProfileDataProps;
   reload: (
@@ -42,7 +39,7 @@ interface Props {
     phone: string,
     whatsapp: string,
     linkedin: string,
-    // facebook: string,
+    facebook: string,
     instagram: string,
     twitter: string,
   ) => void;
@@ -51,15 +48,6 @@ interface Props {
 export default function EditProfile({ profileData, data, reload }: Props) {
   const scrollContainerRef = useRef<HTMLDivElement | null>(null);
 
-  // async function handleScrollEvent(e: React.UIEvent<HTMLDivElement>) {
-  //   if (
-  //     e.currentTarget.clientHeight + e.currentTarget.scrollTop + 1 >=
-  //     e.currentTarget.scrollHeight
-  //   ) {
-  //     // setCount(count + 10);
-  //     await getMoreData();
-  //   }
-  // }
   return (
     <DialogContent className="lg:max-w-3xl xl:max-w-5xl xl:h-[700px] sm:max-w-xl max-w-sm h-[400px] rounded-md">
       <DialogHeader>

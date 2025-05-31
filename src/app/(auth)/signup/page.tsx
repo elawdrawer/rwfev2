@@ -10,7 +10,9 @@ export default function Signup() {
     }
 
     navigator.geolocation.getCurrentPosition(
+      
       (position) => {
+        console.log(position,"position");
         localStorage.setItem(
           "loc_lat",
           JSON.stringify(position.coords.latitude),

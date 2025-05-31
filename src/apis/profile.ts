@@ -22,11 +22,11 @@ export async function othersProfileData(userName: string) {
   }
 }
 
-export async function fetchProfilePosts(id: string, count?: number) {
+export async function fetchProfilePosts(id: string, count?: number, flag?: any) {
   const queryParams = new URLSearchParams({
     limit: "100",
     skip: JSON.stringify(count),
-    flag: "1",
+    flag: flag,
     userId: id,
   }).toString();
   const response = await apiClient(`/userPosts?${queryParams}`, "GET");
@@ -101,9 +101,8 @@ export const getfollowerList = async (id: string, count: number) => {
   }
 };
 
-export const uploadProfileImage = async ( formdata:FormData) => {
-
-  const response = await apiClient(`/uploadProfileImage`, "PUT",formdata);
+export const uploadProfileImage = async (formdata: FormData) => {
+  const response = await apiClient(`/uploadProfileImage`, "PUT", formdata);
   if (response.success && response.data) {
     return response.data;
   } else {
@@ -119,17 +118,25 @@ export const updateUserProfile = async (value: {
   mobile: string;
   dob: Date;
   gender: string;
-  title: string | undefined;
-  desc: string | undefined;
-  watsapp: string | undefined;
-  instagram: string | undefined;
-  twitter: string | undefined;
-  // facebook: string | undefined;
-  linkdin: string | undefined;
+  userName: string;
+  location: string;
+  interest?: string;
+  categoryPref: string[];
+  title?: string;
+  desc?: string;
+  watsapp?: string;
+  instagram?: string;
+  twitter?: string;
+  facebook?: string;
+  linkdin?: string;
 }) => {
   const response = await apiClient(`/profile`, "PUT", {
     indFirstName: value.firstname,
     indLastName: value.lastname,
+    userName: value.userName,
+    location: value.location,
+    interest: value.interest,
+    categoryPref: value.categoryPref,
     title: value.title,
     desc: value.desc,
     indDob: new Date(value.dob)
@@ -137,15 +144,10 @@ export const updateUserProfile = async (value: {
       .split("T")[0]
       .replace(/^"|"$/g, ""),
     indGender: value.gender,
-    // contactUsDetails: {
-    //   indEmail: value.email,
-    //   indCountryCode: "91",
-    //   indMobileNum: value.mobile,
-    // },
     socialUrls: {
       whatsapp: value.watsapp,
       linkedin: value.linkdin,
-      facebook: "",
+      facebook: value.facebook, // Updated from empty string to use the value
       instagram: value.instagram,
       twitter: value.twitter,
     },
@@ -157,7 +159,6 @@ export const updateUserProfile = async (value: {
     return { status: false, message: response.error };
   }
 };
-
 export const getfollowingList = async (id: string, count: number) => {
   let queryParams;
   if (id.length === 0) {
