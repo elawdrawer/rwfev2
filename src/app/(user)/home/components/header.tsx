@@ -39,6 +39,11 @@ export function Header() {
   const router = useRouter();
   const isLoggedIn = isUserLoggedIn();
 
+  const userDataString = localStorage.getItem("uib");
+  // const userData = JSON.parse(userDataString);
+  // const userId = userData._id;
+  console.log(JSON.parse(userDataString || "")._id,"userDataString");
+
   return (
     isLoggedIn && (
       <header
@@ -56,30 +61,30 @@ export function Header() {
           {isMobile && <Sidebar />}
         </div>
         <div
-            onClick={() => router.push("/")}
-            onKeyUp={(e) => {
-              if (e.key === "Enter") router.push("/");
-            }}
-            tabIndex={0}
-            role="button"
-          >
-            <Image
-              alt="Rewardwale"
-              src={whiteLogo}
-              className="w-[160px] hidden dark:inline"
-            />
-            <Image
-              alt="Rewardwale"
-              src={blackLogo}
-              className="w-[160px] inline dark:hidden"
-            />
-          </div>
+          onClick={() => router.push("/")}
+          onKeyUp={(e) => {
+            if (e.key === "Enter") router.push("/");
+          }}
+          tabIndex={0}
+          role="button"
+        >
+          <Image
+            alt="Rewardwale"
+            src={whiteLogo}
+            className="w-[160px] hidden dark:inline"
+          />
+          <Image
+            alt="Rewardwale"
+            src={blackLogo}
+            className="w-[160px] inline dark:hidden"
+          />
+        </div>
         <div className={"flex items-center w-full justify-center"}>
           <SearchInputContainer />
         </div>
 
         <div className="flex items-center gap-2">
-           <div className="hidden md:flex items-center space-x-4">
+          <div className="hidden md:flex items-center space-x-4">
             <ThemeModeToggle />
           </div>
           <DropdownMenu>
@@ -113,7 +118,6 @@ export function Header() {
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-         
         </div>
       </header>
     )

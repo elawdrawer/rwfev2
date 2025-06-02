@@ -4,14 +4,10 @@ import { Suspense, useEffect, useRef, useState } from "react";
 import ProfilePage from "../components/profile-page";
 
 import {
-  fetchProfileData,
-  fetchProfilePosts,
   othersProfileData,
 } from "@/apis/profile";
 import { Header } from "../../home/components/header";
 import { Sidebar } from "../../home/components/sidebar";
-import { Footer } from "@/components/layout";
-import SearchInputContainer from "../../search/components/search-Input-component";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { usePathname } from "next/navigation";
 

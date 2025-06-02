@@ -22,6 +22,11 @@ export const EditPersonalInfo = async (
     instagram,
     twitter,
     linkdin,
+    userName,
+    facebook,
+    location,
+    interest,
+    categoryPref,
   } = validatedFields.data;
 
   const updateProfile = await updateUserProfile({
@@ -37,6 +42,11 @@ export const EditPersonalInfo = async (
     instagram,
     twitter,
     linkdin,
+    userName,
+    facebook,
+    location,
+    interest,
+    categoryPref,
   });
 
   if (updateProfile.status) {

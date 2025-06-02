@@ -15,6 +15,7 @@ export interface Comment {
 // watch
 
 export async function fetchVideoDetails(videoId: any) {
+
   const response = await apiClient(`/watchVideo/${videoId}`, "GET");
 
   if (response.success && response.data) {

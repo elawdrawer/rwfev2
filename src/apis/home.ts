@@ -161,7 +161,7 @@ export async function getLikedVideos() {
     });
 
     const response = await apiClient(
-      `/likesHistory/${userId}?${queryParams.toString()}`,
+      `me/likesHistory/?${queryParams.toString()}`,
       "GET",
     );
     return response;

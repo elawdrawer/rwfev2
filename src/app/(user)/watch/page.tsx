@@ -147,6 +147,7 @@ export default function WatchPage() {
   }, [videos]);
 
   useEffect(() => {
+    
     const loadInitialVideo = async () => {
       try {
         setLoading(true);
@@ -177,20 +178,18 @@ export default function WatchPage() {
       if (videos[currentIndex]?.videoId) {
         try {
           await updateViewCount(videos[currentIndex].videoId);
-          console.log('View count updated for:', videos[currentIndex].videoId);
+          console.log("View count updated for:", videos[currentIndex].videoId);
         } catch (error) {
-          console.error('Error updating view count:', error);
+          console.error("Error updating view count:", error);
         }
       }
     };
-  
+
     // Only update if we have a valid video ID and not the initial load
     if (currentIndex >= 0 && videos.length > 0) {
       updateViews();
     }
-  }, [currentIndex, videos])
-
-  
+  }, [currentIndex]);
 
   const handleScroll = (direction: "up" | "down") => {
     const newIndex =

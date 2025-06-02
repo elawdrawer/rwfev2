@@ -18,6 +18,8 @@ export default function EditPost() {
   const isMobile = useIsMobile();
 
   useEffect(() => {
+   
+
     const fetchData = async () => {
       try {
         const videoId = params.videoId as string;
@@ -36,8 +38,6 @@ export default function EditPost() {
           uploaderRating: apiResponse.data.uploaderRating || {},
           // videoId: videoId
         };
-
-        console.log(transformedData, "transformedData");
 
         setVideoData(transformedData);
       } catch (error) {

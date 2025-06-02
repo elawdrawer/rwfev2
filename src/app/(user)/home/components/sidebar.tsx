@@ -79,8 +79,8 @@ export function Sidebar({ className }: SidebarProps) {
     onClick: () => void;
     forceExpanded?: boolean;
   }) => {
-    const shouldShowCollapsed = (isCollapsed && !isHovered) && !forceExpanded;
-    
+    const shouldShowCollapsed = isCollapsed && !isHovered && !forceExpanded;
+
     if (shouldShowCollapsed) {
       return (
         <TooltipProvider>
@@ -169,84 +169,86 @@ export function Sidebar({ className }: SidebarProps) {
               onClick={() => router.push("/profile")}
               forceExpanded={forceExpanded}
             />
-              <NavButton
+            <NavButton
               icon={HistoryIcon}
               label="History"
               onClick={() => router.push("/history")}
               forceExpanded={forceExpanded}
             />
-                {/* <NavButton
+            <NavButton
               icon={ThumbsUp}
               label="Likes"
               onClick={() => router.push("/likes")}
               forceExpanded={forceExpanded}
             />
-            <NavButton
+            {/* <NavButton
               icon={CreditCard}
               label="Pricing"
               onClick={() => router.push("/pricing")}
-            /> */}
+            />  */}
 
-            {(businessPageData.length > 0 && (!isCollapsed || isHovered || forceExpanded)) && (
-              <div>
-                <button
-                  onClick={() => setIsBusinessPageOpen(!isBusinessPageOpen)}
-                  className="flex items-center justify-between w-full px-4 py-2"
-                >
-                  My Business Page
-                  <span
-                    className={`transform transition-transform duration-100 ${
-                      isBusinessPageOpen ? "rotate-180" : "rotate-0"
-                    }`}
+            {businessPageData.length > 0 &&
+              (!isCollapsed || isHovered || forceExpanded) && (
+                <div>
+                  <button
+                    onClick={() => setIsBusinessPageOpen(!isBusinessPageOpen)}
+                    className="flex items-center justify-between w-full px-4 py-2"
                   >
-                    <ChevronDown />
-                  </span>
-                </button>
-                <div
-                  className={`transition-[max-height] duration-500 overflow-hidden ${
-                    isBusinessPageOpen ? "max-h-96" : "max-h-0"
-                  }`}
-                >
-                  <div className="pl-6 space-y-2">
-                    {businessPageData.map((business) => (
-                      <button
-                        key={business._id}
-                        onClick={() => router.push(`/${business.handle}`)}
-                        className="block w-full text-left px-4 py-2 hover:bg-accent"
-                      >
-                        {business.businessName}
-                      </button>
-                    ))}
+                    My Business Page
+                    <span
+                      className={`transform transition-transform duration-100 ${
+                      isBusinessPageOpen ? "rotate-180" : "rotate-0" }`}
+                    >
+                      <ChevronDown />
+                    </span>
+                  </button>
+                  <div
+                    className={`transition-[max-height] duration-500 overflow-hidden ${
+                    isBusinessPageOpen ? "max-h-96" : "max-h-0" }`}
+                  >
+                    <div className="pl-6 space-y-2">
+                      {businessPageData.map((business) => (
+                        <button
+                          key={business._id}
+                          onClick={() => router.push(`/${business.handle}`)}
+                          className="block w-full text-left px-4 py-2 hover:bg-accent"
+                        >
+                          {business.businessName}
+                        </button>
+                      ))}
+                    </div>
                   </div>
                 </div>
-              </div>
-            )}
+              )}
 
-            {businessPageData.length > 0 && (isCollapsed && !isHovered && !forceExpanded) && (
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      className="w-full justify-center"
-                      onClick={() =>
-                        isCollapsed
-                          ? setIsCollapsed(false)
-                          : setIsCollapsed(true)
-                      }
-                    >
-                      <Building2
-                        className="h-4 w-4"
-                        style={{ width: "24px", height: "24px" }}
-                      />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent side="right">
-                    My Business Pages
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            )}
+            {businessPageData.length > 0 &&
+              isCollapsed &&
+              !isHovered &&
+              !forceExpanded && (
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        className="w-full justify-center"
+                        onClick={() =>
+                          isCollapsed
+                            ? setIsCollapsed(false)
+                            : setIsCollapsed(true)
+                        }
+                      >
+                        <Building2
+                          className="h-4 w-4"
+                          style={{ width: "24px", height: "24px" }}
+                        />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent side="right">
+                      My Business Pages
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              )}
           </div>
         </div>
         <Separator />

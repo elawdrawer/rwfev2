@@ -4,7 +4,7 @@ import { useSearchParams } from "next/navigation";
 import type * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { LoginSchema } from "@/schema";
-import { GoogleLogin } from "@react-oauth/google"; // Ensure this is properly imported
+import { GoogleLogin } from "@react-oauth/google"; 
 import {
   Form,
   FormControl,
@@ -48,7 +48,7 @@ export default function LoginForm() {
       ? "Email already in use with different provider "
       : "";
 
-  const [shwoTwoFactor, setShowTwoFactor] = useState<boolean>(false);
+
   const form = useForm<z.infer<typeof LoginSchema>>({
     resolver: zodResolver(LoginSchema),
     defaultValues: {

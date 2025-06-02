@@ -16,8 +16,6 @@ import {
   verifyOTPEmail,
   verifyOTPMobile,
 } from "@/apis/signUp";
-import { apiClient } from "@/lib/apiClient";
-// import { signInWithProviders } from "@/apis/login";
 
 export const NewSignUp = async (values: z.infer<typeof combinedSchema>) => {
   const validatedFields = combinedSchema.safeParse(values);

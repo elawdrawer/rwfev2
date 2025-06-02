@@ -1,12 +1,12 @@
 "use client";
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
-import { Loader2, AlertCircle } from 'lucide-react';
+import { Loader2, AlertCircle } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { useLocation } from '@/hooks/use-location';
+import { useLocation } from "@/hooks/use-location";
 
 interface LocationInputProps {
   value: string;
@@ -15,7 +15,8 @@ interface LocationInputProps {
 
 export function LocationInput({ value, onChange }: LocationInputProps) {
   const inputRef = useRef<HTMLInputElement>(null);
-  const [autocomplete, setAutocomplete] = useState<google.maps.places.Autocomplete | null>(null);
+  const [autocomplete, setAutocomplete] =
+    useState<google.maps.places.Autocomplete | null>(null);
   const { location, loading, error } = useLocation();
   const [apiError, setApiError] = useState(false);
   const [isInitialized, setIsInitialized] = useState(false);
@@ -28,18 +29,21 @@ export function LocationInput({ value, onChange }: LocationInputProps) {
   }, [location, value, onChange, isInitialized]);
 
   useEffect(() => {
-    if (typeof window === 'undefined' || !window.google) {
+    if (typeof window === "undefined" || !window.google) {
       setApiError(true);
       return;
     }
 
     if (inputRef.current && !autocomplete) {
       try {
-        const autocompleteInstance = new google.maps.places.Autocomplete(inputRef.current, {
-          types: ['geocode'],
-        });
+        const autocompleteInstance = new google.maps.places.Autocomplete(
+          inputRef.current,
+          {
+            types: ["geocode"],
+          },
+        );
 
-        autocompleteInstance.addListener('place_changed', () => {
+        autocompleteInstance.addListener("place_changed", () => {
           const place = autocompleteInstance.getPlace();
           if (place.formatted_address) {
             onChange(place.formatted_address);
@@ -48,10 +52,11 @@ export function LocationInput({ value, onChange }: LocationInputProps) {
 
         setAutocomplete(autocompleteInstance);
       } catch (error) {
-        console.error('Error initializing Google Maps Autocomplete:', error);
+        console.error("Error initializing Google Maps Autocomplete:", error);
         setApiError(true);
       }
     }
+
 
     return () => {
       if (autocomplete) {
@@ -86,7 +91,8 @@ export function LocationInput({ value, onChange }: LocationInputProps) {
         <Alert variant="destructive">
           <AlertCircle className="h-4 w-4" />
           <AlertDescription>
-            Location services are currently unavailable. Please enter your location manually.
+            Location services are currently unavailable. Please enter your
+            location manually.
           </AlertDescription>
         </Alert>
       )}

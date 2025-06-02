@@ -31,31 +31,33 @@ export const SignupSchema = z.object({
   // }),
 });
 
-export const ResetSchema = z.object({
-  indEmail: z.string().email().optional(),
-  indMobileNum: z.string().optional()
-}).superRefine((data, ctx) => {
-  const hasEmail = !!data.indEmail?.trim();
-  const hasPhone = !!data.indMobileNum?.trim();
+export const ResetSchema = z
+  .object({
+    indEmail: z.string().email().optional(),
+    indMobileNum: z.string().optional(),
+  })
+  .superRefine((data, ctx) => {
+    const hasEmail = !!data.indEmail?.trim();
+    const hasPhone = !!data.indMobileNum?.trim();
 
-  if (!hasEmail && !hasPhone) {
-    ctx.addIssue({
-      code: z.ZodIssueCode.custom,
-      message: "Either email or phone must be provided",
-      path: ["indEmail"]
-    });
-  }
-
-  if (hasPhone && data.indMobileNum) {
-    if (!/^\d{10}$/.test(data.indMobileNum)) {
+    if (!hasEmail && !hasPhone) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: "Invalid phone number format (10 digits required)",
-        path: ["indMobileNum"]
+        message: "Either email or phone must be provided",
+        path: ["indEmail"],
       });
     }
-  }
-});
+
+    if (hasPhone && data.indMobileNum) {
+      if (!/^\d{10}$/.test(data.indMobileNum)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Invalid phone number format (10 digits required)",
+          path: ["indMobileNum"],
+        });
+      }
+    }
+  });
 
 export const ForgotEmailSchema = z.object({
   mobile: z
@@ -81,7 +83,6 @@ export const NewPasswordSchema = z
     message: "Passwords do not match",
     path: ["confirmPassword"],
   });
-
 
 export const PersonalInfoFormSchema = z.object({
   gender: z.string({ message: "choose your gender" }).nonempty({
@@ -237,11 +238,6 @@ export const EditPersonalInfoFormSchema = z.object({
   gender: z.string({ message: "choose your gender" }).nonempty({
     message: "Gender cannot be empty.",
   }),
-  // city: z.string({ message: "Enter location" }).nonempty({
-  //   message: "Location cannot be empty.",
-  // }),
-  // .max(10, "Postal code cannot exceed 10 characters")
-  // .regex(/^[a-zA-Z0-9\s\-]+$/, "Invalid postal code format"),
   firstname: z
     .string()
     .nonempty({
@@ -300,7 +296,6 @@ export const EditPersonalInfoFormSchema = z.object({
         message: "You must be at least 18 years old to use this application.",
       },
     ),
-
   mobile: z
     .string()
     .nonempty({
@@ -308,6 +303,42 @@ export const EditPersonalInfoFormSchema = z.object({
     })
     .regex(/^(91[-\s]?)?[6-9]\d{9}$/, {
       message: "Must be a valid 10-digit number.",
+    }),
+  userName: z
+    .string()
+    .nonempty({
+      message: "Username cannot be empty.",
+    })
+    .min(3, {
+      message: "Username must be at least 3 characters long.",
+    })
+    .max(30, {
+      message: "Username cannot exceed 30 characters.",
+    })
+    .regex(/^[a-zA-Z0-9_]+$/, {
+      message: "Username can only contain letters, numbers, and underscores.",
+    }),
+  location: z
+    .string()
+    .nonempty({
+      message: "Location cannot be empty.",
+    })
+    .max(100, {
+      message: "Location cannot exceed 100 characters.",
+    }),
+  interest: z
+    .string()
+    .max(200, {
+      message: "Interests cannot exceed 200 characters.",
+    })
+    .optional(),
+  categoryPref: z
+    .array(z.string())
+    .nonempty({
+      message: "Please select at least one category preference.",
+    })
+    .max(5, {
+      message: "You can select up to 5 category preferences.",
     }),
   title: z.string().optional(),
   desc: z.string().optional(),
@@ -368,16 +399,6 @@ export const EditPersonalInfoFormSchema = z.object({
         message:
           "Enter a valid LinkedIn URL (e.g., https://linkedin.com/in/username)",
       },
-    ),
-  github: z
-    .string()
-    .optional()
-    .refine(
-      (value) =>
-        !value ||
-        value.trim() === "" ||
-        /^https?:\/\/[^\s$.?#].[^\s]*$/.test(value),
-      { message: "Enter a valid GitHub URL" },
     ),
 });
 

@@ -33,6 +33,10 @@ export interface ProfileDataProps {
     websiteUrl?: string;
     indEmail?:string;
     indMobileNum?:string;
+     fname: string;
+  lname: string;
+  location: string;
+  categoryPref: string[];
   }
 
 

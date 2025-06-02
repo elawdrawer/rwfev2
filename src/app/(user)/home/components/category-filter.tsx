@@ -4,7 +4,6 @@ import { useCallback, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { fetchHomeCategories } from "@/apis/home";
-// import { fetchHomeCategories } from "@/lib/api/categories";
 
 export interface Category {
   _id: string;

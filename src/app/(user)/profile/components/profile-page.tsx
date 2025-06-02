@@ -1,4 +1,4 @@
-  "use client";
+"use client";
 import {
   fetchProfilePosts,
   fetchTaggedVideos,
@@ -20,10 +20,7 @@ import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import ProfileItem from "./profileItem";
 import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogTrigger,
-} from "@/components/ui/dialog";
+import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import { FollowersList } from "./followers";
 import { ProfileDataProps, VideoData } from "./dataTypes";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -58,8 +55,8 @@ const ProfilePage = ({ profileData, id }: Props) => {
   const [myProfile, setMyProfile] = useState<boolean>(false);
   const [follower, setFollower] = useState<boolean>();
   const [shareLink, setShareLink] = useState<string>("");
-  const [shareModal, setShareModal] = useState<boolean>(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
+  // Replace the existing data state definition with:
   const [data, setData] = useState<{
     fname: string;
     lname: string;
@@ -70,13 +67,15 @@ const ProfilePage = ({ profileData, id }: Props) => {
     email: string | undefined;
     phone: string | undefined;
     profileImage: string;
-    // SocialUrls: {
-    //   whatsapp: string;
-    //   linkedin: string;
-    //   // facebook: string;
-    //   instagram: string;
-    //   twitter: string;
-    // };
+    userName: string;
+    location: string;
+    interest: string;
+    categoryPref: string[];
+    watsapp: string;
+    linkdin: string;
+    facebook: string;
+    instagram: string;
+    twitter: string;
   }>({
     fname: "",
     lname: "",
@@ -87,13 +86,15 @@ const ProfilePage = ({ profileData, id }: Props) => {
     email: "",
     phone: "",
     profileImage: "",
-    // SocialUrls: {
-    //   whatsapp: "",
-    //   linkedin: "",
-    //   // facebook: "",
-    //   instagram: "",
-    //   twitter: "",
-    // },
+    userName: "",
+    location: "",
+    interest: "",
+    categoryPref: [],
+    watsapp: "",
+    linkdin: "",
+    facebook: "",
+    instagram: "",
+    twitter: "",
   });
 
   useEffect(() => {
@@ -125,8 +126,15 @@ const ProfilePage = ({ profileData, id }: Props) => {
       if (profileData?._id) {
         setData((prev) => ({
           ...prev,
+          // Personal Info
           fname: profileData.indFirstName,
           lname: profileData.indLastName,
+          userName: profileData.userName, // Added
+          location: profileData.location || "", // Added (assuming this comes from videoLocation.locationName)
+          interest: profileData.interest || "", // Added
+          categoryPref: profileData.indCategories || [], // Added
+
+          // Profile Info
           desc: profileData.desc,
           title: profileData.title,
           dob: new Date(profileData.indDob),
@@ -134,13 +142,13 @@ const ProfilePage = ({ profileData, id }: Props) => {
           email: profileData?.indEmail,
           phone: profileData?.indMobileNum,
           profileImage: profileData?.indPic.original,
-          // SocialUrls: {
-          //   whatsapp: profileData?.socialUrls?.whatsapp,
-          //   linkedin: profileData?.socialUrls.linkedin,
-          //   facebook: profileData?.socialUrls.facebook,
-          //   instagram: profileData?.socialUrls.instagram,
-          //   twitter: profileData?.socialUrls.twitter,
-          // },
+
+          // Social URLs
+          watsapp: profileData?.socialUrls?.whatsapp || "", // Added
+          linkdin: profileData?.socialUrls?.linkedin || "", // Added
+          facebook: profileData?.socialUrls?.facebook || "", // Added
+          instagram: profileData?.socialUrls?.instagram || "", // Added
+          twitter: profileData?.socialUrls?.twitter || "", // Added
         }));
 
         const responseData = await fetchProfilePosts(profileData?._id, count);
@@ -149,9 +157,7 @@ const ProfilePage = ({ profileData, id }: Props) => {
           profileData?._id,
           count,
         );
-
         setTaggedVideo(responseDataTagged?.data);
-        // setFollower(profileData.isFollow)
       }
     } catch (error) {
       console.error(error);
@@ -513,7 +519,10 @@ const ProfilePage = ({ profileData, id }: Props) => {
               ))} */}
                 <span className="text-xs sm:text-sm md:text-base">
                   <span className="text-green-500">
-                    {profileData?.avgRating}/5
+                    {profileData?.avgRating
+                      ? (Math.round(profileData.avgRating * 10) / 10).toFixed(1)
+                      : "0.0"}
+                    /5
                   </span>{" "}
                   on{" "}
                   <span className="text-red-500">

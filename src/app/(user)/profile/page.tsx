@@ -3,7 +3,7 @@
 import { lazy, Suspense, useEffect, useState } from "react";
 // import ProfilePage from "./components/profile-page";
 
-import { fetchProfileData, fetchProfilePosts } from "@/apis/profile";
+import { fetchProfileData } from "@/apis/profile";
 import { Header } from "./../home/components/header";
 import { Sidebar } from "./../home/components/sidebar";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -16,7 +16,7 @@ export default function HomePage() {
 
   const isMobile = useIsMobile();
 
-  console.log("data", data);
+  console.log("data in profile", data);
 
   const init = async () => {
     const profileData = await fetchProfileData();
@@ -34,7 +34,9 @@ export default function HomePage() {
 
       <div className="flex overflow-hidden">
         <div>{!isMobile && <Sidebar />}</div>
-        <div className={`flex-1 ${isMobile ? "overflow-scroll" : "overflow-hidden"} scrollbar-hide`}>
+        <div
+          className={`flex-1 ${isMobile ? "overflow-scroll" : "overflow-hidden"} scrollbar-hide`}
+        >
           <Suspense fallback={<div>Loading...</div>}>
             {data && <ProfilePage profileData={data} id={userId} />}
           </Suspense>
